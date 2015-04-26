@@ -90,15 +90,10 @@ void	raycasting(t_wolf *wolf)
   d = p / 2;
   wolf->x_pos_one = d;
   wolf->y_pos_one = (p * (WIN_X / 2 - wolf->x) / WIN_X);
-  printf("1\n");
   raycasting_rotate(wolf);
-  printf("2\n");
   raycasting_translation(wolf);
-  printf("3\n");
   k_y = raycasting_intersection_in_y(wolf, wolf->map);
-  printf("4\n");
   k_x = raycasting_intersection_in_x(wolf, wolf->map);
-  printf("5\n");
   if (k_x < k_y && k_x > 0)
     k = k_x;
   else

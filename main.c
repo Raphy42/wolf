@@ -23,8 +23,10 @@ int			main(void)
 	fillmap(&e);
 	SDL_SetRenderDrawColor(e.render, 0, 0 ,0, 1);
 	SDL_RenderClear(e.render);
-	e.y_pos_zero = 10;
-	e.x_pos_zero = 10;
+	e.y_pos_zero = 2;
+	e.x_pos_zero = 2;
+	e.key_up = 1;
+	key_left(&e);
 	while (1)
 	{
 		while(SDL_PollEvent(&e.event))
