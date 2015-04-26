@@ -13,7 +13,7 @@
 
 NAME		= wolf
 
-SRC 		= main.c tools.c\
+SRC 		= main.c tools.c draw.c event.c raycast.c\
 
 OBJ			= $(SRC:.c=.o)
 
@@ -23,14 +23,15 @@ RM			= rm -rf
 
 CFLAGS		= -Wall -Werror -Wextra
 
-FLAGS		= -L/nfs/zfs-student-5/users/2014/jvolonda/.brew/lib -lSDL2 -L./libft -lft
+SDL_2_CFLAGS= $(shell sdl2-config --cflags)
+SDL_2_LIBS= $(shell sdl2-config --libs)
 
 all		: $(NAME)
 	
 $(NAME)	:
 #	@make -C ./libft re
-	@$(CC) $(CFLAGS) -c -I ./inc -I ./libft/includes -I/nfs/zfs-student-5/users/2014/jvolonda/.brew/include/SDL2 -D_THREAD_SAFE $(SRC)
-	@$(CC) $(CFLAGS) $(OBJ) -L./libft -lft $(FLAGS) -o $(NAME)
+	@$(CC) $(CFLAGS) -c -I ./inc -I ./libft/includes $(SDL_2_CFLAGS) $(SRC)
+	@$(CC) $(CFLAGS) $(OBJ) -L./libft -lft $(SDL_2_LIBS) -o $(NAME)
 	@echo Compilation Done
 
 clean	:

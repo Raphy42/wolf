@@ -12,13 +12,32 @@
 
 #include "wolf.h"
 
-int			draw(t_wolf *e)
+void	draw_wall(t_wolf *wolf, int top, int bottom)
 {
+	while (top <= bottom)
+	{
+		SDL_RenderDrawPoint(wolf->render, wolf->x, top);
+		top++;
+	}
+}
+
+int			draw(t_wolf *e, float k)
+{
+	int	middle;
+	int	wall_middle_height;
+	int	top;
+	int	bottom;
+
+
+	//SDL_SetRenderDrawColor(e->render, 0, 0 ,0, 1);
+	//SDL_RenderClear(e->render);
+	e->key_up = 1;
+	middle = WIN_Y / 2;
+	wall_middle_height = WIN_Y / (2 * k);
+	top = middle - wall_middle_height;
+	bottom = middle + wall_middle_height;
 	SDL_SetRenderDrawColor(e->render, 0, 0 ,0, 1);
-	SDL_RenderClear(e->render);
-	SDL_SetRenderDrawColor(e->render, 255, 0 ,0, 1);
-	SDL_RenderDrawPoint(e->render, e->x, e->y);
-	SDL_RenderPresent(e->render);
+	draw_wall(e, top, bottom);
 	return (1);
 }
 
@@ -26,6 +45,7 @@ int			event(t_wolf *e)
 {
 	if (e->event.type == SDL_KEYDOWN)
 	{
+		printf("clic:%d\n",e->event.key.keysym.sym);
 		if (e->event.key.keysym.sym == 27)
 		{
 			SDL_DestroyWindow(e->window);
@@ -33,14 +53,14 @@ int			event(t_wolf *e)
 			exit(1);
 		}
 		else if (e->event.key.keysym.sym == LEFT)
-			e->x--;
+			key_left(e);
 		else if (e->event.key.keysym.sym == RIGHT)
-			e->x++;
+			key_right(e);
 		else if (e->event.key.keysym.sym == UP)
-			e->y--;
+			key_up(e);
 		else if (e->event.key.keysym.sym == DOWN)
-			e->y++;
-		draw(e);
+			key_down(e);
+		SDL_RenderPresent(e->render);
 	}
 	return (1);
 }
@@ -51,22 +71,18 @@ void		fillmap(t_wolf *e)
 	char	*s;
 	int		y;
 	int		x;
-	int		tmp;
 
 	x = 0;
 	y = 0;
-	tmp = 1;
 	fd = open("map1", O_RDONLY);
 	s = ft_strnew(50);
-	while (tmp)
+	while (get_next_line(fd, &s))
 	{
-		tmp = get_next_line(fd, &s);
 		while (*s)
 		{
 			if (*s == '0' || *s == '1')
 			{ 
 				e->map[y][x] = *s - 48;
-				printf("%d--x%d--y%d\n", e->map[y][x],x,y);
 				x++;
 			}
 			s++;
