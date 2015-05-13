@@ -3,34 +3,40 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jvolonda <jvolonda@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/04/25 16:26:27 by jvolonda          #+#    #+#             */
-/*   Updated: 2015/04/25 17:47:09 by jvolonda         ###   ########.fr       */
+/*   Created: 2015/04/25 16:26:27 by lejoliwolf3d      #+#    #+#             */
+/*   Updated: 2015/05/12 12:57:43 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "wolf.h"
 
-int			main(void)
+char				**singleton_map(void)
 {
-	t_wolf	e;
+	static char		*map[256];
 
-	ft_bzero(&e, sizeof(t_wolf));
-	SDL_Init(SDL_INIT_VIDEO);
-	e.window = SDL_CreateWindow( "wolf3d",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,800,600,SDL_WINDOW_SHOWN);
-	e.render = SDL_CreateRenderer(e.window,-1,SDL_RENDERER_ACCELERATED);
-	fillmap(&e);
-	SDL_SetRenderDrawColor(e.render, 0, 0 ,0, 1);
-	SDL_RenderClear(e.render);
-	e.y_pos_zero = 2;
-	e.x_pos_zero = 2;
-	e.key_up = 1;
-	key_left(&e);
+	return (map);
+}
+
+int					main(void)
+{
+	t_env			e;
+
+	ft_bzero(&e, sizeof(t_env));
+	init(&e);
+	create_texture_array(&e);
 	while (1)
 	{
+		e.time_start = e.time_end;
+		e.time_end = SDL_GetTicks();
+		e.frame_time = (e.time_end - e.time_start) / 1000.0;
+		SDL_SetRenderDrawColor(e.render, 150, 150 , 150, 1);
+		SDL_RenderClear(e.render);
 		while(SDL_PollEvent(&e.event))
 			event(&e);
+		draw(&e);
+		SDL_RenderPresent(e.render);
 	}
 	return (0);
 }

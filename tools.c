@@ -3,64 +3,47 @@
 /*                                                        :::      ::::::::   */
 /*   tools.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jvolonda <jvolonda@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/04/25 15:46:31 by jvolonda          #+#    #+#             */
-/*   Updated: 2015/04/25 18:39:33 by jvolonda         ###   ########.fr       */
+/*   Created: 2015/05/08 16:31:55 by rdantzer          #+#    #+#             */
+/*   Updated: 2015/05/12 15:02:24 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "wolf.h"
+#include "libft.h"
 
-int			event(t_wolf *e)
+const t_texture_descriptor		g_textures[] = {
+	{WALL_BLUESTONE, "bluestone.bmp"},
+	{WALL_COLORSTONE, "colorstone.bmp"},
+	{WALL_GREYSTONE, "greystone.bmp"},
+	{WALL_MOSSY, "moss.bmp"},
+	{WALL_PURPLESTONE, "purplestone.png"},
+	{WALL_REDBRICK, "redbrick.png"},
+	{WALL_WOOD, "wood.bmp"},
+	{PROP_BARREL, "barrel.png"},
+	{PROP_PILLAR, "pillar.png"},
+	{PROP_GREENLIGHT, "greenlight.png"}
+};
+
+SDL_Surface			*load_texture(t_texture_type name)
 {
-	if (e->event.type == SDL_KEYDOWN)
-	{
-		printf("clic:%d\n",e->event.key.keysym.sym);
-		if (e->event.key.keysym.sym == 27)
-		{
-			SDL_DestroyWindow(e->window);
-			SDL_Quit();
-			exit(1);
-		}
-		else if (e->event.key.keysym.sym == LEFT)
-			key_left(e);
-		else if (e->event.key.keysym.sym == RIGHT)
-			key_right(e);
-		else if (e->event.key.keysym.sym == UP && e->key_up)
-			key_up(e);
-		else if (e->event.key.keysym.sym == DOWN && e->x_pos_zero > 0.5 && e->x_pos_zero < SIZE_MAP - 0.5 && e->y_pos_zero > 0.5 && e->y_pos_zero < SIZE_MAP - 0.5)
-			key_down(e);
-		SDL_RenderPresent(e->render);
-	}
-	return (1);
+	char			*path;
+	SDL_Surface		*surface;
+
+	path = g_textures[name].name;
+	path = ft_strjoin("resources/", path);
+	surface = SDL_LoadBMP(path);
+	free(path);
+	ft_fprintf(2, "Loading surface: %s\n", SDL_GetError());
+	ft_fprintf(2, "Surface information: %dw %dh\n", surface->w, surface->h);
+	return (surface);
 }
 
-void		fillmap(t_wolf *e)
+void				create_texture_array(t_env *e)
 {
-	int		fd;
-	char	*s;
-	int		y;
-	int		x;
-	int		i;
-
-	y = 0;
-	fd = open("map1", O_RDONLY);
-	s = ft_strnew(20);
-	while (get_next_line(fd, &s))
-	{
-		x = 0;
-		i = 0;
-		while (s[i])
-		{
-			if (s[i] == '0' || s[i] == '1')
-			{ 
-				e->map[y][x] = s[i] - 48;
-				x++;
-			}
-			i++;
-		}
-		y++;
-	}
-	free(s);
+	e->wall_greystone = load_texture(WALL_GREYSTONE);
+	e->wall_colorstone = load_texture(WALL_COLORSTONE);
+	e->wall_wood = load_texture(WALL_WOOD);
+	e->wall_bluestone = load_texture(WALL_BLUESTONE);
 }
