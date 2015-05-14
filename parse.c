@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:25:07 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/13 17:26:34 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/14 19:07:47 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,18 @@ static void			convert_map(t_env *e)
 	}
 }
 
+static void			create_img_buffer(t_env *e)
+{
+	Uint32			*p;
+	SDL_Texture		*tex;
+
+	p = (Uint32 *)malloc(WIN_X * WIN_Y * sizeof(Uint32));
+	tex = SDL_CreateTexture(e->render, SDL_PIXELFORMAT_ARGB8888,
+		SDL_TEXTUREACCESS_STREAMING, WIN_X, WIN_Y);
+	e->img = tex;
+	e->img_buffer = p;
+}
+
 void				init(t_env *e)
 {
 	const int		fd = open_map();
@@ -98,5 +110,6 @@ void				init(t_env *e)
 	e->dir.y = 0;
 	e->plane.y = 0.66;
 	e->plane.x = 0;
+	create_img_buffer(e);
 	convert_map(e);
 }

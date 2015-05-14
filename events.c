@@ -6,41 +6,72 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:07:27 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/13 19:52:46 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/14 18:08:17 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "wolf.h"
 #include "libft.h"
 
-int					event(t_env *e)
+static void		kill_all(t_env *e)
 {
-	const double	rotation_speed = e->frame_time * 3.0;
+	SDL_DestroyWindow(e->window);
+	SDL_DestroyRenderer(e->render);
+	SDL_Quit();
+	exit(EXIT_SUCCESS);
+}
+
+void			event(t_env *e)
+{
+    if (e->event.type == SDL_KEYDOWN)
+    {
+        if (KEY == 27)
+            kill_all(e);
+        else if (KEY == SDLK_LEFT)
+            e->key.left = 1;
+        else if (KEY == SDLK_RIGHT)
+            e->key.right= 1;
+        else if (KEY == SDLK_UP)
+            e->key.up = 1;
+        else if (KEY == SDLK_DOWN)
+            e->key.down = 1;
+		return ;
+    }
+    else if (e->event.type == SDL_KEYUP)
+    {
+        if (KEY == SDLK_LEFT)
+            e->key.left = 0;
+        else if (KEY == SDLK_RIGHT)
+            e->key.right= 0;
+        else if (KEY == SDLK_UP)
+            e->key.up = 0;
+        else if (KEY == SDLK_DOWN)
+            e->key.down = 0;
+        else
+            return ;
+    }
+}
+
+void				run_event(t_env *e)
+{
+	const double	rotation_speed = e->frame_time * 1.5;
 	const double	move_speed = e->frame_time * 5.0;
 
-	SDL_Delay(5);
-	if (e->event.key.keysym.sym == 27)
-	{
-		SDL_DestroyWindow(e->window);
-		SDL_DestroyRenderer(e->render);
-		SDL_Quit();
-		exit(EXIT_SUCCESS);
-	}
-	if (e->event.key.keysym.sym == SDLK_UP)
+	if (e->key.up)
 	{
 		if (e->level[(int)(e->pos.x + e->dir.x * move_speed)][(int)e->pos.y] == 0)
 			e->pos.x += e->dir.x * move_speed;
 		if (e->level[(int)e->pos.x][(int)(e->pos.y + e->dir.y * move_speed)] == 0)
 			e->pos.y += e->dir.y * move_speed;
 	}
-	if (e->event.key.keysym.sym == SDLK_DOWN)
+	if (e->key.down)
 	{
 		if (e->level[(int)(e->pos.x + e->dir.x * move_speed)][(int)e->pos.y] == 0)
 			e->pos.x -= e->dir.x * move_speed;
 		if (e->level[(int)e->pos.x][(int)(e->pos.y + e->dir.y * move_speed)] == 0)
 			e->pos.y -= e->dir.y * move_speed;
 	}
-	if (e->event.key.keysym.sym == SDLK_RIGHT)
+	if (e->key.right)
 	{
 		e->old_dir_x = e->dir.x;
 		e->dir.x = e->dir.x * cos(-rotation_speed) - e->dir.y * sin(-rotation_speed);
@@ -49,7 +80,7 @@ int					event(t_env *e)
 		e->plane.x = e->plane.x * cos(-rotation_speed) - e->plane.y * sin(-rotation_speed);
 		e->plane.y = e->old_plane_x * sin(-rotation_speed) + e->plane.y * cos(-rotation_speed);
 	}
-	if (e->event.key.keysym.sym == SDLK_LEFT)
+	if (e->key.left)
 	{
 		e->old_dir_x = e->dir.x;
 		e->dir.x = e->dir.x * cos(rotation_speed) - e->dir.y * sin(rotation_speed);
@@ -58,5 +89,4 @@ int					event(t_env *e)
 		e->plane.x = e->plane.x * cos(rotation_speed) - e->plane.y * sin(rotation_speed);
 		e->plane.y = e->old_plane_x * sin(rotation_speed) + e->plane.y * cos(rotation_speed);
 	}
-	return (1);
 }

@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 04:14:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/13 19:58:32 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/14 19:20:51 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,9 @@
 #include "libft.h"
 #include <math.h>
 
-void		bmp_draw(t_env *e, SDL_Surface *img, int startx, int starty)
+Uint32 create_color(int r, int g, int b)
 {
-	int		x;
-	int		y;
-
-	x = 0;
-	while (x < img->w && x + startx < WIN_X)
-	{
-		y = 0;
-		while (y < img->h && y + starty < WIN_Y)
-		{
-			SDL_Color color = ((SDL_Color *)img->pixels)[x + (y * img->w)];
-			if (!(color.r == 255 && color.g == 0 && color.b == 255))
-			{	
-				SDL_SetRenderDrawColor(e->render, color.b, color.g ,color.r, 1);
-				SDL_RenderDrawPoint(e->render, x+startx, y + starty);
-			}
-			y++;
-		}
-		x++;
-	}
+	return (((r<<8)+ g)<<8 )+ b;
 }
 
 void			operate_rgba(t_rgba *c, char op, int value)
@@ -60,19 +42,102 @@ void			create_rgb(t_rgba *c, int r, int g, int b)
 	c->b = b;
 }
 
-const int h = WIN_Y;
-const int w = WIN_X;
-
-void		draw_sky(t_env *e)
+static void			init_floor_cast(t_raycast *r, t_floorcast *f)
 {
-	for (int x = 0; x < w; x++)
+	if(r->side == 0 && r->ray_dir.x > 0)
 	{
-		for (int y = 0; y < h /2; y++)
-		{
-			SDL_SetRenderDrawColor(e->render, 0, 0, y * 255 / h, 1);
-			SDL_RenderDrawPoint(e->render, x, y);
-		}
+		f->floor_wall.x = r->map_x;
+		f->floor_wall.y = r->map_y + r->wall_x;
 	}
+	else if (r->side == 0 && r->ray_dir.x < 0)
+	{
+		f->floor_wall.x = r->map_x + 1.0;
+		f->floor_wall.y = r->map_y + r->wall_x;
+	}
+	else if (r->side == 1 && r->ray_dir.y > 0)
+	{
+		f->floor_wall.x = r->map_x + r->wall_x;
+		f->floor_wall.y = r->map_y;
+	}
+	else
+	{
+		f->floor_wall.x = r->map_x + r->wall_x;
+		f->floor_wall.y = r->map_y + 1.0;
+	} 
+	f->dist_wall = r->perp_wall_dist;
+	f->dist_player = 0.0;
+}
+
+void				floor_cast(t_env *e, t_raycast *r, int x)
+{
+	t_floorcast		f;
+	t_rgba			color;
+	int				checker;
+	SDL_Surface		*selected_surface;
+	int				y;
+
+	init_floor_cast(r, &f);
+	if (r->draw_end < 0)
+		r->draw_end = r->h;
+	y = r->draw_end;
+	while (++y < r->h)
+	{
+		f.current_dist = r->h / (2.0 * y - r->h); //you could make a small lookup table for this instead
+		f.weight = (f.current_dist - f.dist_player) / (f.dist_wall - f.dist_player);
+		f.current_floor.x = f.weight * f.floor_wall.x + (1.0 - f.weight) * e->pos.x;
+		f.current_floor.y = f.weight * f.floor_wall.y + (1.0 - f.weight) * e->pos.y;
+		f.floor_tex_x = (int)(f.current_floor.x * TEX_WIDTH) % TEX_WIDTH;
+		f.floor_tex_y = (int)(f.current_floor.y * TEX_HEIGHT) % TEX_HEIGHT;
+		selected_surface = e->wall_wood;
+		checker = ((int)f.current_floor.x + (int)f.current_floor.y) % 2;
+		if(checker == 0)
+			color = ((t_rgba *)selected_surface->pixels)[TEX_WIDTH * f.floor_tex_y + f.floor_tex_x];
+		else
+			color = ((t_rgba *)selected_surface->pixels)[TEX_WIDTH * f.floor_tex_x + f.floor_tex_y];
+		e->img_buffer[WIN_X * y + x] = create_color(color.b, color.g, color.r);
+		e->img_buffer[WIN_X * (r->h - y) + x] = create_color(color.b, color.g, color.r);
+	}
+}
+
+static void	init_ray_cast(t_env *e, t_raycast *r, int x)
+{
+	r->camera_x = 2 * x / (float) (r->w) - 1;
+	r->ray_pos.x = e->pos.x;
+	r->ray_pos.y = e->pos.y;
+	r->ray_dir.x = e->dir.x + e->plane.x*r->camera_x;
+	r->ray_dir.y = e->dir.y + e->plane.y*r->camera_x;
+	r->map_x = (int)(r->ray_pos.x);
+	r->map_y = (int)(r->ray_pos.y);
+	r->delta_dist.x = sqrt(1 + (r->ray_dir.y * r->ray_dir.y) / (r->ray_dir.x * r->ray_dir.x));
+	r->delta_dist.y = sqrt(1 + (r->ray_dir.x * r->ray_dir.x) / (r->ray_dir.y * r->ray_dir.y));
+	if (r->ray_dir.x < 0)
+	{
+		r->step_x = -1;
+		r->side_dist.x = (r->ray_pos.x - r->map_x) * r->delta_dist.x;
+	}
+	else
+	{
+		r->step_x = 1;
+		r->side_dist.x = (r->map_x + 1.0 - r->ray_pos.x) * r->delta_dist.x;
+	}
+	if (r->ray_dir.y < 0)
+	{
+		r->step_y = -1;
+		r->side_dist.y = (r->ray_pos.y - r->map_y) * r->delta_dist.y;
+	}
+	else
+	{
+		r->step_y = 1;
+		r->side_dist.y = (r->map_y + 1.0 - r->ray_pos.y) * r->delta_dist.y;
+	}
+}
+
+static int	check_collision(t_env *e, t_raycast *r)
+{
+	if (e->level[r->map_x][r->map_y] > 0)
+		return (1);
+	else
+		return (0);
 }
 
 void		draw(t_env *e)
@@ -81,176 +146,78 @@ void		draw(t_env *e)
 	int			hit;
 	int			wall_type;
 	t_rgba		color;
-	t_floorcast f;
 	t_raycast	r;
-	int			side;
+	SDL_Surface *selected_surface;
 
 	x = -1;
 	r.h = WIN_Y;
 	r.w = WIN_X;
-	draw_sky(e);
 	while (++x < r.w)
 	{
-		      //calculate ray position and direction 
-      r.camera_x = 2 * x / (double) (w) - 1; //x-coordinate in camera space     
-      r.ray_pos.x = e->pos.x;
-      r.ray_pos.y = e->pos.y;
-      r.ray_dir.x = e->dir.x + e->plane.x*r.camera_x;
-      r.ray_dir.y = e->dir.y + e->plane.y*r.camera_x;
-     
-      //which box of the map we're in  
-      r.map_x = (int)(r.ray_pos.x);
-      r.map_y = (int)(r.ray_pos.y);
-      //length of ray from current position to next x or y-side
-      //length of ray from one x or y-side to next x or y-side
-      r.delta_dist.x = sqrt(1 + (r.ray_dir.y * r.ray_dir.y) / (r.ray_dir.x * r.ray_dir.x));
-      r.delta_dist.y = sqrt(1 + (r.ray_dir.x * r.ray_dir.x) / (r.ray_dir.y * r.ray_dir.y));
-      double perpWallDist;
-       
-      //what direction to step in x or y-direction (either +1 or -1)
-      hit = 0; //was there a wall hit?
-      //was a NS or a EW wall hit?
-
-      //calculate step and initial sideDist
-      if (r.ray_dir.x < 0)
-      {
-        r.step_x = -1;
-        r.side_dist.x = (r.ray_pos.x - r.map_x) * r.delta_dist.x;
-      }
-      else
-      {
-        r.step_x = 1;
-        r.side_dist.x = (r.map_x + 1.0 - r.ray_pos.x) * r.delta_dist.x;
-      }      
-      if (r.ray_dir.y < 0)
-      {
-        r.step_y = -1;
-        r.side_dist.y = (r.ray_pos.y - r.map_y) * r.delta_dist.y;
-      }
-      else
-      {
-        r.step_y = 1;
-        r.side_dist.y = (r.map_y + 1.0 - r.ray_pos.y) * r.delta_dist.y;
-      }
-      //perform DDA
-      while (hit == 0)
-      {
-        //jump to next map square, OR in x-direction, OR in y-direction
-        if (r.side_dist.x < r.side_dist.y)
-        {
-          r.side_dist.x += r.delta_dist.x;
-          r.map_x += r.step_x;
-          side = 0;
-        }
-        else
-        {
-          r.side_dist.y += r.delta_dist.y;
-          r.map_y += r.step_y;
-          side = 1;
-        }
-		//Check if ray has hit a wall
-		if (e->level[r.map_x][r.map_y] > 0)
-			hit = 1;				
-		}
-		wall_type = e->level[r.map_x][r.map_y];
-		SDL_Surface *selected_surface;
-		if (wall_type == 1)
-			selected_surface = e->wall_greystone;
-		else if (wall_type == 2)
-			selected_surface = e->wall_colorstone;
-		else if (wall_type == 3)
-			selected_surface = e->wall_wood;
-		else
-			selected_surface = e->wall_bluestone;
-		if (side == 0) perpWallDist = fabs((r.map_x - r.ray_pos.x + (1 - r.step_x) / 2) / r.ray_dir.x);
-      else           perpWallDist = fabs((r.map_y - r.ray_pos.y + (1 - r.step_y) / 2) / r.ray_dir.y);
-        
-      //Calculate height of line to draw on screen
-      int lineHeight = abs((int)(h / perpWallDist));
-       
-      //calculate lowest and highest pixel to fill in current stripe
-      int drawStart = -lineHeight / 2 + h / 2;
-      if(drawStart < 0)
-      	drawStart = 0;
-      int drawEnd = lineHeight / 2 + h / 2;
-      if(drawEnd >= h)
-      	drawEnd = h - 1;
-      
-		//where exactly the wall was hit
-		 double wallX; //where exactly the wall was hit
-      if (side == 1) wallX = r.ray_pos.x + ((r.map_y - r.ray_pos.y + (1 - r.step_y) / 2) / r.ray_dir.y) * r.ray_dir.x;
-      else           wallX = r.ray_pos.y + ((r.map_x - r.ray_pos.x + (1 - r.step_x) / 2) / r.ray_dir.x) * r.ray_dir.y;
-      wallX -= floor((wallX));
-       
-      //x coordinate on the texture
-      int texX = (int)(wallX * (double)(TEX_WIDTH));
-      if(side == 0 && r.ray_dir.x > 0) texX = TEX_WIDTH - texX - 1;
-      if(side == 1 && r.ray_dir.y < 0) texX = TEX_WIDTH - texX - 1;
-      	for(int y = drawStart; y < drawEnd; y++)
-		{
+			init_ray_cast(e, &r, x);
+			hit = 0;
+			while (hit == 0)
+			{
+				//jump to next map square, OR in x-direction, OR in y-direction
+				if (r.side_dist.x < r.side_dist.y)
+				{
+					r.side_dist.x += r.delta_dist.x;
+					r.map_x += r.step_x;
+					r.side = 0;
+				}
+				else
+				{
+					r.side_dist.y += r.delta_dist.y;
+					r.map_y += r.step_y;
+					r.side = 1;
+				}
+				hit = check_collision(e, &r);
+			}
+			wall_type = e->level[r.map_x][r.map_y];
+			if (wall_type == 1)
+				selected_surface = e->wall_greystone;
+			else if (wall_type == 2)
+				selected_surface = e->wall_colorstone;
+			else if (wall_type == 3)
+				selected_surface = e->wall_wood;
+			else
+				selected_surface = e->wall_bluestone;
+			if (r.side == 0)
+				r.perp_wall_dist = fabs((r.map_x - r.ray_pos.x + (1 - r.step_x) / 2) / r.ray_dir.x);
+			else
+				r.perp_wall_dist = fabs((r.map_y - r.ray_pos.y + (1 - r.step_y) / 2) / r.ray_dir.y);
+			int lineHeight = abs((int)(r.h / r.perp_wall_dist));
+			r.draw_start = -lineHeight / 2 + r.h / 2;
+			if(r.draw_start < 0)
+				r.draw_start = 0;
+			r.draw_end = lineHeight / 2 + r.h / 2;
+			if(r.draw_end >= r.h)
+				r.draw_end = r.h - 1;
+			if (r.side == 1)
+				r.wall_x = r.ray_pos.x + ((r.map_y - r.ray_pos.y + (1 - r.step_y) / 2)
+					/ r.ray_dir.y) * r.ray_dir.x;
+			else
+				r.wall_x = r.ray_pos.y + ((r.map_x - r.ray_pos.x + (1 - r.step_x) / 2)
+					/ r.ray_dir.x) * r.ray_dir.y;
+			r.wall_x -= floor((r.wall_x));
+			int texX = (int)(r.wall_x * (float)(TEX_WIDTH));
+			if(r.side == 0 && r.ray_dir.x > 0)
+				texX = TEX_WIDTH - texX - 1;
+			if(r.side == 1 && r.ray_dir.y < 0)
+				texX = TEX_WIDTH - texX - 1;
+			for(int y = r.draw_start; y < r.draw_end; y++)
+			{
 			int d = y * 256 - r.h * 128 + lineHeight * 128;  //256 and 128 factors to avoid floats
 			int texY = ((d * TEX_HEIGHT) / lineHeight) / 256;
 			color = ((t_rgba *)selected_surface->pixels)[TEX_WIDTH * texY + texX];
-			if(side == 1)
+			if(r.side == 1)
 			{
 				color.r = (color.r >> 1) & 8355711;
 				color.g = (color.g >> 1) & 8355711;
 				color.b = (color.b >> 1) & 8355711;
 			}
-		SDL_SetRenderDrawColor(e->render, color.b, color.g ,color.r, 1);
-		SDL_RenderDrawPoint(e->render, x, y);
+			e->img_buffer[WIN_X * y + x] = create_color(color.b, color.g, color.r);
 		}
-	//FLOOR CASTING
-		//x, y position of the floor texel at the bottom of the wall
-      //4 different wall directions possible
-      //x, y position of the floor texel at the bottom of the wall
-
-      //4 different wall directions possible
-      if(side == 0 && r.ray_dir.x > 0)
-      {
-        f.floor_wall.x = r.map_x;
-        f.floor_wall.y = r.map_y + wallX;
-      }
-      else if(side == 0 && r.ray_dir.x < 0)
-      {
-        f.floor_wall.x = r.map_x + 1.0;
-        f.floor_wall.y = r.map_y + wallX;
-      }
-      else if(side == 1 && r.ray_dir.y > 0)
-      {
-        f.floor_wall.x = r.map_x + wallX;
-        f.floor_wall.y = r.map_y;
-      }
-      else
-      {
-        f.floor_wall.x = r.map_x + wallX;
-        f.floor_wall.y = r.map_y + 1.0;
-      } 
-      f.dist_wall = perpWallDist;
-      f.dist_player = 0.0;
-
-      if (drawEnd < 0) drawEnd = h; //becomes < 0 when the integer overflows
-      
-      //draw the floor from drawEnd to the bottom of the screen
-      for(int y = drawEnd + 1; y < h; y++)
-      {
-        f.current_dist = h / (2.0 * y - h); //you could make a small lookup table for this instead
-        f.weight = (f.current_dist - f.dist_player) / (f.dist_wall - f.dist_player);
-        f.current_floor.x = f.weight * f.floor_wall.x + (1.0 - f.weight) * e->pos.x;
-        f.current_floor.y = f.weight * f.floor_wall.y + (1.0 - f.weight) * e->pos.y;
-        f.floor_tex_x = (int)(f.current_floor.x * TEX_WIDTH) % TEX_WIDTH;
-        f.floor_tex_y = (int)(f.current_floor.y * TEX_HEIGHT) % TEX_HEIGHT;
-        
-        //floor
-        selected_surface = e->wall_wood;
-        int checkerBoardPattern = ((int)f.current_floor.x + (int)f.current_floor.y) % 2;
-        if(checkerBoardPattern == 0)
-        	color = ((t_rgba *)selected_surface->pixels)[TEX_WIDTH * f.floor_tex_y + f.floor_tex_x];
-        else
-			color = ((t_rgba *)selected_surface->pixels)[TEX_WIDTH * f.floor_tex_x + f.floor_tex_y];
-		SDL_SetRenderDrawColor(e->render, color.b, color.g ,color.r, 1);
-		SDL_RenderDrawPoint(e->render, x, y);
-      	//SDL_RenderDrawPoint(e->render, x, r.h - y);
-      }
-    }
+		floor_cast(e, &r, x);
+	}
 }

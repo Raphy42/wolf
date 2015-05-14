@@ -6,11 +6,12 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 16:26:27 by lejoliwolf3d      #+#    #+#             */
-/*   Updated: 2015/05/14 16:32:25 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/14 19:39:43 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "wolf.h"
+#include <stdio.h>
 
 char				**singleton_map(void)
 {
@@ -35,8 +36,12 @@ int					main(void)
 		SDL_RenderClear(e.render);
 		while(SDL_PollEvent(&e.event))
 			event(&e);
+		run_event(&e);
 		draw(&e);
+		SDL_UpdateTexture(e.img, NULL, e.img_buffer, WIN_X * sizeof(Uint32));
+		SDL_RenderCopy(e.render, e.img, NULL, NULL);
 		SDL_RenderPresent(e.render);
+		ft_fprintf(2, "\033[1m%ffps\r\033[0m", 1 / e.frame_time);
 	}
 	return (0);
 }
