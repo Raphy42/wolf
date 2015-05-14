@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:25:07 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/12 21:59:30 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/13 17:26:34 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,10 @@ static void			parse_map(int fd, t_env *e)
 		exit (ft_fprintf(2, "Map is empty\n"));
 	e->map_w = ft_strlen(map[0]);
 	e->map_h = size;
-	size = 0;
+	size = -1;
 	ft_fprintf(1, "Map loaded (%d x %d)\n", e->map_w, e->map_h);
+	while (map[++size])
+		ft_fprintf(1, "%s\n", map[size]);
 }
 
 static void			convert_map(t_env *e)
@@ -70,7 +72,7 @@ static void			convert_map(t_env *e)
 				e->pos.x = i;
 				e->pos.y = j;
 			}
-			ft_fprintf(1, "%c", e->level[i][j] == 0 ? 0x20 : '#');
+			ft_fprintf(1, "%s", e->level[i][j] == 0 ? " " : "\u2593");
 		}
 		ft_fprintf(1, "\n");
 	}

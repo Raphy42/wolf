@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 14:44:00 by leboheader        #+#    #+#             */
-/*   Updated: 2015/05/12 14:46:49 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/14 15:21:03 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,13 +57,10 @@ typedef struct			s_pos
 	double				y;
 }						t_pos;
 
-typedef struct			s_map
+typedef struct			s_raycast
 {
 	int					w;
 	int					h;
-	t_pos				pos;
-	t_pos				dir;
-	t_pos				plane;
 	double				camera_x;
 	t_pos				ray_pos;
 	t_pos				ray_dir;
@@ -74,8 +71,20 @@ typedef struct			s_map
 	double				perp_wall_dist;
 	int					step_x;
 	int					step_y;
-	int					wall_side;
-}						t_map;
+	double				wall_side;
+}						t_raycast;
+
+typedef struct			s_floorcast
+{
+	t_pos				floor_wall;
+	double				dist_wall;
+	double				dist_player;
+	double				current_dist;
+	double				weight;
+	t_pos				current_floor;
+	int					floor_tex_x;
+	int					floor_tex_y;
+}						t_floorcast;
 
 typedef struct			s_env
 {
@@ -102,9 +111,6 @@ typedef struct			s_env
 }						t_env;
 
 char					**singleton_map(void);
-/*
-**	events.c
-*/
 int						event(t_env *e);
 void					init(t_env *e);
 void					draw(t_env *e);
