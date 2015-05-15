@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:07:27 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/14 18:08:17 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/15 23:09:56 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,11 +54,12 @@ void			event(t_env *e)
 
 void				run_event(t_env *e)
 {
-	const double	rotation_speed = e->frame_time * 1.5;
-	const double	move_speed = e->frame_time * 5.0;
+	const double		rotation_speed = e->frame_time * 1.5;
+	const double		move_speed = e->frame_time * 5.0;
 
 	if (e->key.up)
 	{
+
 		if (e->level[(int)(e->pos.x + e->dir.x * move_speed)][(int)e->pos.y] == 0)
 			e->pos.x += e->dir.x * move_speed;
 		if (e->level[(int)e->pos.x][(int)(e->pos.y + e->dir.y * move_speed)] == 0)
@@ -89,4 +90,5 @@ void				run_event(t_env *e)
 		e->plane.x = e->plane.x * cos(rotation_speed) - e->plane.y * sin(rotation_speed);
 		e->plane.y = e->old_plane_x * sin(rotation_speed) + e->plane.y * cos(rotation_speed);
 	}
+	check_prop_collide(e);
 }

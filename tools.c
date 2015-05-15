@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 16:31:55 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/15 19:48:01 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/15 23:16:30 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 const t_texture_descriptor		g_textures[] = {
 	{WALL_BLUESTONE, "bluestone.bmp"},
+	{WALL_BLUESTONE_JAIL, "bluestone_jail.bmp"},
 	{WALL_COLORSTONE, "colorstone.bmp"},
 	{WALL_GREYSTONE, "greystone.bmp"},
 	{WALL_MOSSY, "moss.bmp"},
@@ -22,7 +23,8 @@ const t_texture_descriptor		g_textures[] = {
 	{PROP_BARREL, "barrel.bmp"},
 	{PROP_SKULLPILE, "skullpile.bmp"},
 	{PROP_ARMOR, "armor.bmp"},
-	{PROP_LAMP, "lamp.bmp"}
+	{PROP_LAMP, "lamp.bmp"},
+	{COLLEC_JEWELBOX, "jewelbox.bmp"}
 };
 
 SDL_Surface			*load_texture(t_texture_type name)
@@ -49,4 +51,21 @@ void				create_texture_array(t_env *e)
 	e->prop_skullpile = load_texture(PROP_SKULLPILE);
 	e->prop_armor = load_texture(PROP_ARMOR);
 	e->prop_lamp = load_texture(PROP_LAMP);
+	e->wall_bluestone_jail = load_texture(WALL_BLUESTONE_JAIL);
+	e->collec_jewelbox = load_texture(COLLEC_JEWELBOX);
 }
+
+int					check_prop_collide(t_env *e)
+{
+	int				i;
+
+	i = -1;
+	while (++i < e->sprite_count)
+	{
+		if ((int)e->pos.x == (int)e->sprite[i].pos.x && (int)e->pos.y == (int)e->sprite[i].pos.y &&
+			e->sprite[i].pick_up)
+			e->sprite[i].pick_up = 0;
+	}
+	return (0);
+}
+

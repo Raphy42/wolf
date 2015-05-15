@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:25:07 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/15 19:49:40 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/15 23:04:02 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ static void			parse_map(int fd, t_env *e)
 		ft_fprintf(1, "%s\n", map[size]);
 }
 
-static void			create_new_sprite(t_env *e, int i, int j, int type)
+static int			create_new_sprite(t_env *e, int i, int j, int type)
 {
 	int				k;
 
@@ -63,10 +63,15 @@ static void			create_new_sprite(t_env *e, int i, int j, int type)
 		e->sprite[k].sprite = PROP_ARMOR;
 	else if (type == 'L')
 		e->sprite[k].sprite = PROP_LAMP;
-	ft_fprintf(2, "Loaded sprite %c %d at %d:%d\n", type, k + 1, i, j);
+	else if (type == 'J')
+		e->sprite[k].sprite = COLLEC_JEWELBOX;
 	e->sprite[k].pos.x = i + .5;
 	e->sprite[k].pos.y = j + .5;
+	e->sprite[k].obstacle = (type == 'B' || type == 'A') ? 1 : 0;
+	e->sprite[k].destroy = 0;
+	e->sprite[k].pick_up = (type == 'J');
 	e->sprite_count++;
+	return (-e->sprite[k].obstacle);
 }
 
 static void			convert_map(t_env *e)
@@ -93,8 +98,7 @@ static void			convert_map(t_env *e)
 			}
 			if (ft_isalpha(map[i][j]))
 			{
-				e->level[i][j] = 0;
-				create_new_sprite(e, i, j, map[i][j]);
+				e->level[i][j] = create_new_sprite(e, i, j, map[i][j]);
 			}
 			ft_fprintf(1, "%s", e->level[i][j] == 0 ? " " : "\u2593");
 		}

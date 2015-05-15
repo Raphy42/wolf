@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 04:14:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/15 19:53:22 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/15 23:04:22 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 Uint32 create_color(int r, int g, int b)
 {
-	return (((r<<8)+ g)<<8 )+ b;
+	return (((r << 8)+ g) << 8)+ b;
 }
 
 void			operate_rgba(t_rgba *c, char op, int value)
@@ -101,7 +101,7 @@ void				floor_cast(t_env *e, t_raycast *r, int x)
 
 static void	init_ray_cast(t_env *e, t_raycast *r, int x)
 {
-	r->camera_x = 2 * x / (float) (r->w) - 1;
+	r->camera_x = 2 * x / (double) (r->w) - 1;
 	r->ray_pos.x = e->pos.x;
 	r->ray_pos.y = e->pos.y;
 	r->ray_dir.x = e->dir.x + e->plane.x*r->camera_x;
@@ -155,11 +155,17 @@ void		sprite_cast(t_env *e, t_raycast *r)
 			selected_sprite = e->prop_armor;
 		else if (e->sprite[i].sprite == PROP_SKULLPILE)
 			selected_sprite = e->prop_skullpile;
-		float spriteX = e->sprite[i].pos.x - e->pos.x;
-		float spriteY = e->sprite[i].pos.y - e->pos.y;
-		float invDet = 1.0 / (e->plane.x * e->dir.y - e->dir.x * e->plane.y); //required for correct matrix multiplication
-		float transformX = invDet * (e->dir.y * spriteX - e->dir.x * spriteY);
-		float transformY = invDet * (-e->plane.y * spriteX + e->plane.x * spriteY); //this is actually the depth inside the screen, that what Z is in 3D       
+		else if (e->sprite[i].sprite == COLLEC_JEWELBOX)
+		{
+			selected_sprite = e->collec_jewelbox;
+			if (e->sprite[i].pick_up == 0)
+				continue ;
+		}
+		double spriteX = e->sprite[i].pos.x - e->pos.x;
+		double spriteY = e->sprite[i].pos.y - e->pos.y;
+		double invDet = 1.0 / (e->plane.x * e->dir.y - e->dir.x * e->plane.y); //required for correct matrix multiplication
+		double transformX = invDet * (e->dir.y * spriteX - e->dir.x * spriteY);
+		double transformY = invDet * (-e->plane.y * spriteX + e->plane.x * spriteY); //this is actually the depth inside the screen, that what Z is in 3D       
 		int spriteScreenX = (int)((r->w / 2) * (1 + transformX / transformY));
 		int spriteHeight = abs((int)(r->h / (transformY))); //using "transformY" instead of the real distance prevents fisheye
 		int drawStartY = -spriteHeight / 2 + r->h / 2;
@@ -181,7 +187,7 @@ void		sprite_cast(t_env *e, t_raycast *r)
 			if(transformY > 0 && stripe > 0 && stripe < r->w && transformY < r->z_buffer[stripe]) 
 			for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
 			{
-				int d = (y) * 256 - r->h * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
+				int d = (y) * 256 - r->h * 128 + spriteHeight * 128; //256 and 128 factors to avoid doubles
 				int texY = ((d * e->prop_barrel->h) / spriteHeight) / 256;
 				color = ((t_rgba *)selected_sprite->pixels)[selected_sprite->w * texY + texX];
 				if (!(color.r == 255 && color.g == 0 && color.b == 255))
@@ -231,8 +237,10 @@ void		draw(t_env *e)
 			selected_surface = e->wall_colorstone;
 		else if (wall_type == 3)
 			selected_surface = e->wall_wood;
-		else
+		else if (wall_type == 4)
 			selected_surface = e->wall_bluestone;
+		else if (wall_type == 5)
+			selected_surface = e->wall_bluestone_jail;
 		if (r.side == 0)
 			r.perp_wall_dist = fabs((r.map_x - r.ray_pos.x + (1 - r.step_x) / 2) / r.ray_dir.x);
 		else
@@ -251,14 +259,14 @@ void		draw(t_env *e)
 			r.wall_x = r.ray_pos.y + ((r.map_x - r.ray_pos.x + (1 - r.step_x) / 2)
 				/ r.ray_dir.x) * r.ray_dir.y;
 		r.wall_x -= floor((r.wall_x));
-		int texX = (int)(r.wall_x * (float)(TEX_WIDTH));
+		int texX = (int)(r.wall_x * (double)(TEX_WIDTH));
 		if(r.side == 0 && r.ray_dir.x > 0)
 			texX = TEX_WIDTH - texX - 1;
 		if(r.side == 1 && r.ray_dir.y < 0)
 			texX = TEX_WIDTH - texX - 1;
 		for(int y = r.draw_start; y < r.draw_end; y++)
 		{
-			int d = y * 256 - r.h * 128 + lineHeight * 128;  //256 and 128 factors to avoid floats
+			int d = y * 256 - r.h * 128 + lineHeight * 128;  //256 and 128 factors to avoid doubles
 			int texY = ((d * TEX_HEIGHT) / lineHeight) / 256;
 			color = ((t_rgba *)selected_surface->pixels)[TEX_WIDTH * texY + texX];
 			if(r.side == 1)
