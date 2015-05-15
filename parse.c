@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:25:07 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/14 19:07:47 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/15 17:54:15 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,21 @@ static void			parse_map(int fd, t_env *e)
 		ft_fprintf(1, "%s\n", map[size]);
 }
 
+static void			create_new_sprite(t_env *e, int i, int j, int type)
+{
+	int				k;
+
+	k = e->sprite_count;
+	if (type == 'B')
+		e->sprite[k].sprite = PROP_BARREL;
+	else if (type == 'S')
+		e->sprite[k].sprite = PROP_SKULLPILE;
+	ft_fprintf(2, "Loaded sprite %d %d at %d:%d\n", type, k + 1, i, j);
+	e->sprite[k].pos.x = i;
+	e->sprite[k].pos.y = j;
+	e->sprite_count++;
+}
+
 static void			convert_map(t_env *e)
 {
 	int				i;
@@ -71,6 +86,11 @@ static void			convert_map(t_env *e)
 				e->level[i][j] = 0;
 				e->pos.x = i;
 				e->pos.y = j;
+			}
+			if (ft_isalpha(map[i][j]))
+			{
+				e->level[i][j] = 0;
+				create_new_sprite(e, i, j, map[i][j]);
 			}
 			ft_fprintf(1, "%s", e->level[i][j] == 0 ? " " : "\u2593");
 		}

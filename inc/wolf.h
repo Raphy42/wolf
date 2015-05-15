@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 14:44:00 by leboheader        #+#    #+#             */
-/*   Updated: 2015/05/14 19:07:24 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/15 03:55:27 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,8 @@ typedef enum			e_texture_type
 	WALL_WOOD,
 	PROP_BARREL,
 	PROP_PILLAR,
-	PROP_GREENLIGHT
+	PROP_GREENLIGHT,
+	PROP_SKULLPILE
 }						t_texture_type;
 
 typedef struct			s_key
@@ -66,6 +67,12 @@ typedef struct			s_pos
 	float				y;
 }						t_pos;
 
+typedef struct			s_sprite
+{
+	t_pos				pos;
+	t_texture_type		sprite;
+}						t_sprite;
+
 typedef struct			s_raycast
 {
 	int					w;
@@ -84,6 +91,7 @@ typedef struct			s_raycast
 	int					side;
 	int					draw_start;
 	int					draw_end;
+	float				z_buffer[WIN_X];
 }						t_raycast;
 
 typedef struct			s_floorcast
@@ -120,14 +128,18 @@ typedef struct			s_env
 	SDL_Surface			*wall_wood;
 	SDL_Surface			*wall_colorstone;
 	SDL_Surface			*wall_bluestone;
+	SDL_Surface			*prop_barrel;
+	SDL_Surface			*prop_skullpile;
 	SDL_Texture			*img;
 	Uint32				*img_buffer;
 	t_key				key;
+	t_sprite			sprite[10];
+	int					sprite_count;
 }						t_env;
 
 char					**singleton_map(void);
-void						event(t_env *e);
-void				run_event(t_env *e);
+void					event(t_env *e);
+void					run_event(t_env *e);
 void					init(t_env *e);
 void					draw(t_env *e);
 SDL_Surface				*load_texture(t_texture_type name);

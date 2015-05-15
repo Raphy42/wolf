@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 16:31:55 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/14 19:35:01 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/15 03:59:04 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,10 @@ const t_texture_descriptor		g_textures[] = {
 	{WALL_PURPLESTONE, "purplestone.png"},
 	{WALL_REDBRICK, "redbrick.png"},
 	{WALL_WOOD, "wood.bmp"},
-	{PROP_BARREL, "barrel.png"},
+	{PROP_BARREL, "barrel.bmp"},
 	{PROP_PILLAR, "pillar.png"},
-	{PROP_GREENLIGHT, "greenlight.png"}
+	{PROP_GREENLIGHT, "greenlight.png"},
+	{PROP_SKULLPILE, "skull_pile.bmp"}
 };
 
 SDL_Surface			*load_texture(t_texture_type name)
@@ -46,4 +47,6 @@ void				create_texture_array(t_env *e)
 	e->wall_colorstone = load_texture(WALL_COLORSTONE);
 	e->wall_wood = load_texture(WALL_WOOD);
 	e->wall_bluestone = load_texture(WALL_BLUESTONE);
+	e->prop_barrel = load_texture(PROP_BARREL);
+	e->prop_skullpile = load_texture(PROP_SKULLPILE);
 }

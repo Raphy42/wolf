@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 04:14:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/14 19:20:51 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/15 17:53:01 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ void				floor_cast(t_env *e, t_raycast *r, int x)
 		else
 			color = ((t_rgba *)selected_surface->pixels)[TEX_WIDTH * f.floor_tex_x + f.floor_tex_y];
 		e->img_buffer[WIN_X * y + x] = create_color(color.b, color.g, color.r);
-		e->img_buffer[WIN_X * (r->h - y) + x] = create_color(color.b, color.g, color.r);
+	//	e->img_buffer[WIN_X * (r->h - y) + x] = create_color(color.b, color.g, color.r);
 	}
 }
 
@@ -140,6 +140,49 @@ static int	check_collision(t_env *e, t_raycast *r)
 		return (0);
 }
 
+void		sprite_cast(t_env *e, t_raycast *r)
+{
+	t_rgba	color;
+	SDL_Surface		*selected_sprite = e->prop_skullpile;
+
+	for(int i = 0; i < e->sprite_count; i++)
+	{
+		float spriteX = e->sprite[i].pos.x - e->pos.x;
+		float spriteY = e->sprite[i].pos.y - e->pos.y;
+		float invDet = 1.0 / (e->plane.x * e->dir.y - e->dir.x * e->plane.y); //required for correct matrix multiplication
+		float transformX = invDet * (e->dir.y * spriteX - e->dir.x * spriteY);
+		float transformY = invDet * (-e->plane.y * spriteX + e->plane.x * spriteY); //this is actually the depth inside the screen, that what Z is in 3D       
+		int spriteScreenX = (int)((r->w / 2) * (1 + transformX / transformY));
+		int spriteHeight = abs((int)(r->h / (transformY))); //using "transformY" instead of the real distance prevents fisheye
+		int drawStartY = -spriteHeight / 2 + r->h / 2;
+		if(drawStartY < 0)
+			drawStartY = 0;
+		int drawEndY = spriteHeight / 2 + r->h / 2;
+		if(drawEndY >= r->h)
+			drawEndY = r->h - 1;
+		int spriteWidth = abs((int)(r->h / (transformY)));
+		int drawStartX = -spriteWidth / 2 + spriteScreenX;
+		if(drawStartX < 0)
+			drawStartX = 0;
+		int drawEndX = spriteWidth / 2 + spriteScreenX;
+		if(drawEndX >= r->w)
+			drawEndX = r->w - 1;
+		for(int stripe = drawStartX; stripe < drawEndX; stripe++)
+		{
+			int texX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * e->prop_barrel->w / spriteWidth) / 256;
+			if(transformY > 0 && stripe > 0 && stripe < r->w && transformY < r->z_buffer[stripe]) 
+			for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
+			{
+				int d = (y) * 256 - r->h * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
+				int texY = ((d * e->prop_barrel->h) / spriteHeight) / 256;
+				color = ((t_rgba *)selected_sprite->pixels)[selected_sprite->w * texY + texX];
+				if (color.r != 255 && color.g != 0 && color.b != 255)
+					e->img_buffer[WIN_X * y + stripe] = create_color(color.b, color.g, color.r);
+			}
+		}
+	}
+}
+
 void		draw(t_env *e)
 {
 	int			x;
@@ -154,59 +197,59 @@ void		draw(t_env *e)
 	r.w = WIN_X;
 	while (++x < r.w)
 	{
-			init_ray_cast(e, &r, x);
-			hit = 0;
-			while (hit == 0)
+		init_ray_cast(e, &r, x);
+		hit = 0;
+		while (hit == 0)
+		{
+			//jump to next map square, OR in x-direction, OR in y-direction
+			if (r.side_dist.x < r.side_dist.y)
 			{
-				//jump to next map square, OR in x-direction, OR in y-direction
-				if (r.side_dist.x < r.side_dist.y)
-				{
-					r.side_dist.x += r.delta_dist.x;
-					r.map_x += r.step_x;
-					r.side = 0;
-				}
-				else
-				{
-					r.side_dist.y += r.delta_dist.y;
-					r.map_y += r.step_y;
-					r.side = 1;
-				}
-				hit = check_collision(e, &r);
+				r.side_dist.x += r.delta_dist.x;
+				r.map_x += r.step_x;
+				r.side = 0;
 			}
-			wall_type = e->level[r.map_x][r.map_y];
-			if (wall_type == 1)
-				selected_surface = e->wall_greystone;
-			else if (wall_type == 2)
-				selected_surface = e->wall_colorstone;
-			else if (wall_type == 3)
-				selected_surface = e->wall_wood;
 			else
-				selected_surface = e->wall_bluestone;
-			if (r.side == 0)
-				r.perp_wall_dist = fabs((r.map_x - r.ray_pos.x + (1 - r.step_x) / 2) / r.ray_dir.x);
-			else
-				r.perp_wall_dist = fabs((r.map_y - r.ray_pos.y + (1 - r.step_y) / 2) / r.ray_dir.y);
-			int lineHeight = abs((int)(r.h / r.perp_wall_dist));
-			r.draw_start = -lineHeight / 2 + r.h / 2;
-			if(r.draw_start < 0)
-				r.draw_start = 0;
-			r.draw_end = lineHeight / 2 + r.h / 2;
-			if(r.draw_end >= r.h)
-				r.draw_end = r.h - 1;
-			if (r.side == 1)
-				r.wall_x = r.ray_pos.x + ((r.map_y - r.ray_pos.y + (1 - r.step_y) / 2)
-					/ r.ray_dir.y) * r.ray_dir.x;
-			else
-				r.wall_x = r.ray_pos.y + ((r.map_x - r.ray_pos.x + (1 - r.step_x) / 2)
-					/ r.ray_dir.x) * r.ray_dir.y;
-			r.wall_x -= floor((r.wall_x));
-			int texX = (int)(r.wall_x * (float)(TEX_WIDTH));
-			if(r.side == 0 && r.ray_dir.x > 0)
-				texX = TEX_WIDTH - texX - 1;
-			if(r.side == 1 && r.ray_dir.y < 0)
-				texX = TEX_WIDTH - texX - 1;
-			for(int y = r.draw_start; y < r.draw_end; y++)
 			{
+				r.side_dist.y += r.delta_dist.y;
+				r.map_y += r.step_y;
+				r.side = 1;
+			}
+			hit = check_collision(e, &r);
+		}
+		wall_type = e->level[r.map_x][r.map_y];
+		if (wall_type == 1)
+			selected_surface = e->wall_greystone;
+		else if (wall_type == 2)
+			selected_surface = e->wall_colorstone;
+		else if (wall_type == 3)
+			selected_surface = e->wall_wood;
+		else
+			selected_surface = e->wall_bluestone;
+		if (r.side == 0)
+			r.perp_wall_dist = fabs((r.map_x - r.ray_pos.x + (1 - r.step_x) / 2) / r.ray_dir.x);
+		else
+			r.perp_wall_dist = fabs((r.map_y - r.ray_pos.y + (1 - r.step_y) / 2) / r.ray_dir.y);
+		int lineHeight = abs((int)(r.h / r.perp_wall_dist));
+		r.draw_start = -lineHeight / 2 + r.h / 2;
+		if(r.draw_start < 0)
+			r.draw_start = 0;
+		r.draw_end = lineHeight / 2 + r.h / 2;
+		if(r.draw_end >= r.h)
+			r.draw_end = r.h - 1;
+		if (r.side == 1)
+			r.wall_x = r.ray_pos.x + ((r.map_y - r.ray_pos.y + (1 - r.step_y) / 2)
+				/ r.ray_dir.y) * r.ray_dir.x;
+		else
+			r.wall_x = r.ray_pos.y + ((r.map_x - r.ray_pos.x + (1 - r.step_x) / 2)
+				/ r.ray_dir.x) * r.ray_dir.y;
+		r.wall_x -= floor((r.wall_x));
+		int texX = (int)(r.wall_x * (float)(TEX_WIDTH));
+		if(r.side == 0 && r.ray_dir.x > 0)
+			texX = TEX_WIDTH - texX - 1;
+		if(r.side == 1 && r.ray_dir.y < 0)
+			texX = TEX_WIDTH - texX - 1;
+		for(int y = r.draw_start; y < r.draw_end; y++)
+		{
 			int d = y * 256 - r.h * 128 + lineHeight * 128;  //256 and 128 factors to avoid floats
 			int texY = ((d * TEX_HEIGHT) / lineHeight) / 256;
 			color = ((t_rgba *)selected_surface->pixels)[TEX_WIDTH * texY + texX];
@@ -218,6 +261,8 @@ void		draw(t_env *e)
 			}
 			e->img_buffer[WIN_X * y + x] = create_color(color.b, color.g, color.r);
 		}
+		r.z_buffer[x] = r.perp_wall_dist;
 		floor_cast(e, &r, x);
 	}
+	sprite_cast(e, &r);
 }
