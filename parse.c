@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:25:07 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/15 17:54:15 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/15 19:49:40 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,13 @@ static void			create_new_sprite(t_env *e, int i, int j, int type)
 		e->sprite[k].sprite = PROP_BARREL;
 	else if (type == 'S')
 		e->sprite[k].sprite = PROP_SKULLPILE;
-	ft_fprintf(2, "Loaded sprite %d %d at %d:%d\n", type, k + 1, i, j);
-	e->sprite[k].pos.x = i;
-	e->sprite[k].pos.y = j;
+	else if (type == 'A')
+		e->sprite[k].sprite = PROP_ARMOR;
+	else if (type == 'L')
+		e->sprite[k].sprite = PROP_LAMP;
+	ft_fprintf(2, "Loaded sprite %c %d at %d:%d\n", type, k + 1, i, j);
+	e->sprite[k].pos.x = i + .5;
+	e->sprite[k].pos.y = j + .5;
 	e->sprite_count++;
 }
 

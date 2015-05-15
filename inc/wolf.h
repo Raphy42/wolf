@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 14:44:00 by leboheader        #+#    #+#             */
-/*   Updated: 2015/05/15 03:55:27 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/15 19:49:55 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,13 +31,11 @@ typedef enum			e_texture_type
 	WALL_COLORSTONE,
 	WALL_GREYSTONE,
 	WALL_MOSSY,
-	WALL_PURPLESTONE,
-	WALL_REDBRICK,
 	WALL_WOOD,
 	PROP_BARREL,
-	PROP_PILLAR,
-	PROP_GREENLIGHT,
-	PROP_SKULLPILE
+	PROP_SKULLPILE,
+	PROP_ARMOR,
+	PROP_LAMP
 }						t_texture_type;
 
 typedef struct			s_key
@@ -130,10 +128,12 @@ typedef struct			s_env
 	SDL_Surface			*wall_bluestone;
 	SDL_Surface			*prop_barrel;
 	SDL_Surface			*prop_skullpile;
+	SDL_Surface			*prop_armor;
+	SDL_Surface			*prop_lamp;
 	SDL_Texture			*img;
 	Uint32				*img_buffer;
 	t_key				key;
-	t_sprite			sprite[10];
+	t_sprite			sprite[16];
 	int					sprite_count;
 }						t_env;
 

@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 04:14:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/15 17:53:01 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/15 19:53:22 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ void				floor_cast(t_env *e, t_raycast *r, int x)
 		else
 			color = ((t_rgba *)selected_surface->pixels)[TEX_WIDTH * f.floor_tex_x + f.floor_tex_y];
 		e->img_buffer[WIN_X * y + x] = create_color(color.b, color.g, color.r);
-	//	e->img_buffer[WIN_X * (r->h - y) + x] = create_color(color.b, color.g, color.r);
+		e->img_buffer[WIN_X * (r->h - y) + x] = create_color(color.b, color.g, color.r);
 	}
 }
 
@@ -143,10 +143,18 @@ static int	check_collision(t_env *e, t_raycast *r)
 void		sprite_cast(t_env *e, t_raycast *r)
 {
 	t_rgba	color;
-	SDL_Surface		*selected_sprite = e->prop_skullpile;
+	SDL_Surface		*selected_sprite;
 
 	for(int i = 0; i < e->sprite_count; i++)
 	{
+		if (e->sprite[i].sprite == PROP_LAMP)
+			selected_sprite = e->prop_lamp;
+		else if (e->sprite[i].sprite == PROP_BARREL)
+			selected_sprite = e->prop_barrel;
+		else if (e->sprite[i].sprite == PROP_ARMOR)
+			selected_sprite = e->prop_armor;
+		else if (e->sprite[i].sprite == PROP_SKULLPILE)
+			selected_sprite = e->prop_skullpile;
 		float spriteX = e->sprite[i].pos.x - e->pos.x;
 		float spriteY = e->sprite[i].pos.y - e->pos.y;
 		float invDet = 1.0 / (e->plane.x * e->dir.y - e->dir.x * e->plane.y); //required for correct matrix multiplication
@@ -176,7 +184,7 @@ void		sprite_cast(t_env *e, t_raycast *r)
 				int d = (y) * 256 - r->h * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
 				int texY = ((d * e->prop_barrel->h) / spriteHeight) / 256;
 				color = ((t_rgba *)selected_sprite->pixels)[selected_sprite->w * texY + texX];
-				if (color.r != 255 && color.g != 0 && color.b != 255)
+				if (!(color.r == 255 && color.g == 0 && color.b == 255))
 					e->img_buffer[WIN_X * y + stripe] = create_color(color.b, color.g, color.r);
 			}
 		}
@@ -261,8 +269,8 @@ void		draw(t_env *e)
 			}
 			e->img_buffer[WIN_X * y + x] = create_color(color.b, color.g, color.r);
 		}
-		r.z_buffer[x] = r.perp_wall_dist;
 		floor_cast(e, &r, x);
+		r.z_buffer[x] = r.perp_wall_dist;
 	}
 	sprite_cast(e, &r);
 }
