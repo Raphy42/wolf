@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:25:07 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/15 23:04:02 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/18 05:32:53 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,30 +48,6 @@ static void			parse_map(int fd, t_env *e)
 	ft_fprintf(1, "Map loaded (%d x %d)\n", e->map_w, e->map_h);
 	while (map[++size])
 		ft_fprintf(1, "%s\n", map[size]);
-}
-
-static int			create_new_sprite(t_env *e, int i, int j, int type)
-{
-	int				k;
-
-	k = e->sprite_count;
-	if (type == 'B')
-		e->sprite[k].sprite = PROP_BARREL;
-	else if (type == 'S')
-		e->sprite[k].sprite = PROP_SKULLPILE;
-	else if (type == 'A')
-		e->sprite[k].sprite = PROP_ARMOR;
-	else if (type == 'L')
-		e->sprite[k].sprite = PROP_LAMP;
-	else if (type == 'J')
-		e->sprite[k].sprite = COLLEC_JEWELBOX;
-	e->sprite[k].pos.x = i + .5;
-	e->sprite[k].pos.y = j + .5;
-	e->sprite[k].obstacle = (type == 'B' || type == 'A') ? 1 : 0;
-	e->sprite[k].destroy = 0;
-	e->sprite[k].pick_up = (type == 'J');
-	e->sprite_count++;
-	return (-e->sprite[k].obstacle);
 }
 
 static void			convert_map(t_env *e)

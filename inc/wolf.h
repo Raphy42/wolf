@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 14:44:00 by leboheader        #+#    #+#             */
-/*   Updated: 2015/05/15 23:14:11 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/18 19:36:47 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 # include "libft.h"
 # include "SDL.h"
 
-# define MAP_PATH		"map1"
+# define MAP_PATH		"map2"
+# define SPRITE_DB		"spritedb"
 # define MAP			singleton_map();
 # define M				e->map
 # define WIN_X			1800
@@ -33,11 +34,13 @@ typedef enum			e_texture_type
 	WALL_GREYSTONE,
 	WALL_MOSSY,
 	WALL_WOOD,
+	WALL_WOOD_PAINT,
 	PROP_BARREL,
 	PROP_SKULLPILE,
 	PROP_ARMOR,
 	PROP_LAMP,
-	COLLEC_JEWELBOX
+	COLLEC_JEWELBOX,
+	HUD_MAIN
 }						t_texture_type;
 
 typedef struct			s_key
@@ -74,6 +77,7 @@ typedef struct			s_sprite
 	int					obstacle;
 	int					destroy;
 	int					pick_up;
+	int					value;
 }						t_sprite;
 
 typedef struct			s_raycast
@@ -129,6 +133,7 @@ typedef struct			s_env
 	double				hit_point;
 	SDL_Surface			*wall_greystone;
 	SDL_Surface			*wall_wood;
+	SDL_Surface			*wall_wood_paint;
 	SDL_Surface			*wall_colorstone;
 	SDL_Surface			*wall_bluestone;
 	SDL_Surface			*wall_bluestone_jail;
@@ -137,6 +142,7 @@ typedef struct			s_env
 	SDL_Surface			*prop_armor;
 	SDL_Surface			*prop_lamp;
 	SDL_Surface			*collec_jewelbox;
+	SDL_Texture			*hud;
 	SDL_Texture			*img;
 	Uint32				*img_buffer;
 	t_key				key;
@@ -144,14 +150,16 @@ typedef struct			s_env
 	int					sprite_count;
 }						t_env;
 
+Uint32					create_color(int r, int g, int b);
 char					**singleton_map(void);
 void					event(t_env *e);
 void					run_event(t_env *e);
 void					init(t_env *e);
 void					draw(t_env *e);
 SDL_Surface				*load_texture(t_texture_type name);
-void					bmp_draw(t_env *e, SDL_Surface *img, int startx, int starty);
 void					create_texture_array(t_env *e);
 int						check_prop_collide(t_env *e);
+void					sprite_cast(t_env *e, t_raycast *r);
+int						create_new_sprite(t_env *e, int i, int j, int type);
 
 #endif

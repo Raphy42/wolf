@@ -6,14 +6,14 @@
 #    By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2015/04/21 19:14:13 by mrbanane          #+#    #+#              #
-#    Updated: 2015/05/08 16:41:24 by rdantzer         ###   ########.fr        #
+#    Updated: 2015/05/18 05:32:39 by rdantzer         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 
 NAME= wolf
 
-SRC= main.c events.c parse.c draw.c tools.c
+SRC= main.c events.c parse.c draw.c tools.c sprite.c
 
 OBJ= $(SRC:.c=.o)
 
