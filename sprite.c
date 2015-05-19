@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/18 05:31:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/19 05:14:42 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/19 12:15:14 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,19 +15,21 @@
 void			sprite_sort(t_sprite *sprite, int n)
 {
 	t_sprite	swap;
-	int			i;
-
-	i = 0;
-	while(i < n - 1)
+	int en_desordre = 1;
+	int i,j;
+ 
+	for (i = 0; (i < n) && en_desordre; ++i)
 	{
-		if (sprite[i].distance >= sprite[i + 1].distance)
-			i++;
-		else
+		en_desordre = 0;
+		for (j = 1; j < (n - i); ++j)
 		{
-			i = 0;
-			swap = sprite[i];
-			sprite[i] = sprite[i + 1];
-			sprite[i + 1] = swap;
+			if (sprite[j-1].distance <= sprite[j].distance)
+			{
+				swap = sprite[j-1];
+				sprite[j-1] = sprite[j];
+				sprite[j] = swap;
+				en_desordre = 1;
+ 			}
 		}
 	}
 }

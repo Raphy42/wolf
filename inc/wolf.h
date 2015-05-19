@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 14:44:00 by leboheader        #+#    #+#             */
-/*   Updated: 2015/05/18 21:50:32 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/19 12:15:51 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 # include "libft.h"
 # include "SDL.h"
 
-# define MAP_PATH		"map2"
+# define MAP_PATH		"map1"
 # define SPRITE_DB		"spritedb"
 # define MAP			singleton_map();
 # define M				e->map
