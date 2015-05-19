@@ -6,12 +6,13 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 16:26:27 by lejoliwolf3d      #+#    #+#             */
-/*   Updated: 2015/05/18 19:29:07 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/19 01:05:35 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "wolf.h"
 #include <stdio.h>
+#include <signal.h>
 
 char				**singleton_map(void)
 {
@@ -20,10 +21,17 @@ char				**singleton_map(void)
 	return (map);
 }
 
+void				sighandler(int sig)
+{
+	(void)sig;
+	exit (EXIT_FAILURE);
+}
+
 int					main(void)
 {
 	t_env			e;
 
+	signal(SIGINT, &sighandler);
 	ft_bzero(&e, sizeof(t_env));
 	init(&e);
 	create_texture_array(&e);

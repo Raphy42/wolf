@@ -6,9 +6,11 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:07:27 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/15 23:09:56 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/18 20:39:40 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+
 
 #include "wolf.h"
 #include "libft.h"
@@ -67,9 +69,9 @@ void				run_event(t_env *e)
 	}
 	if (e->key.down)
 	{
-		if (e->level[(int)(e->pos.x + e->dir.x * move_speed)][(int)e->pos.y] == 0)
+		if (e->level[(int)(e->pos.x - e->dir.x * move_speed)][(int)e->pos.y] == 0)
 			e->pos.x -= e->dir.x * move_speed;
-		if (e->level[(int)e->pos.x][(int)(e->pos.y + e->dir.y * move_speed)] == 0)
+		if (e->level[(int)e->pos.x][(int)(e->pos.y - e->dir.y * move_speed)] == 0)
 			e->pos.y -= e->dir.y * move_speed;
 	}
 	if (e->key.right)

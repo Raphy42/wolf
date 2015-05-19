@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 04:14:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/18 08:35:35 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/19 01:40:14 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,12 @@
 #include "libft.h"
 #include <math.h>
 
-Uint32 create_color(int r, int g, int b)
+Uint32				create_color(int r, int g, int b)
 {
 	return (((r << 8)+ g) << 8)+ b;
 }
 
-void			operate_rgba(t_rgba *c, char op, int value)
+void				operate_rgba(t_rgba *c, char op, int value)
 {
 	if (op == '/')
 	{
@@ -35,7 +35,7 @@ void			operate_rgba(t_rgba *c, char op, int value)
 	}
 }
 
-void			create_rgb(t_rgba *c, int r, int g, int b)
+void				create_rgb(t_rgba *c, int r, int g, int b)
 {
 	c->r = r;
 	c->g = g;
@@ -82,7 +82,7 @@ void				floor_cast(t_env *e, t_raycast *r, int x)
 	y = r->draw_end;
 	while (++y < r->h)
 	{
-		f.current_dist = r->h / (2.0 * y - r->h); //you could make a small lookup table for this instead
+		f.current_dist = r->h / (2.0 * y - r->h);
 		f.weight = (f.current_dist - f.dist_player) / (f.dist_wall - f.dist_player);
 		f.current_floor.x = f.weight * f.floor_wall.x + (1.0 - f.weight) * e->pos.x;
 		f.current_floor.y = f.weight * f.floor_wall.y + (1.0 - f.weight) * e->pos.y;

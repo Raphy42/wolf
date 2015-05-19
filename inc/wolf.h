@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 14:44:00 by leboheader        #+#    #+#             */
-/*   Updated: 2015/05/18 19:36:47 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/18 21:50:32 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@
 # define SPRITE_DB		"spritedb"
 # define MAP			singleton_map();
 # define M				e->map
-# define WIN_X			1800
-# define WIN_Y			1200
+# define WIN_X			800
+# define WIN_Y			600
 # define TEX_WIDTH		512
 # define TEX_HEIGHT		512
 # define KEY			e->event.key.keysym.sym
@@ -78,6 +78,7 @@ typedef struct			s_sprite
 	int					destroy;
 	int					pick_up;
 	int					value;
+	int					distance;
 }						t_sprite;
 
 typedef struct			s_raycast

@@ -6,11 +6,45 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/18 05:31:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/18 08:27:00 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/19 05:14:42 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "wolf.h"
+
+void			sprite_sort(t_sprite *sprite, int n)
+{
+	t_sprite	swap;
+	int			i;
+
+	i = 0;
+	while(i < n - 1)
+	{
+		if (sprite[i].distance >= sprite[i + 1].distance)
+			i++;
+		else
+		{
+			i = 0;
+			swap = sprite[i];
+			sprite[i] = sprite[i + 1];
+			sprite[i + 1] = swap;
+		}
+	}
+}
+
+void			update_sprite_pos(t_env *e)
+{
+	int			i;
+
+	i = -1;
+	while (++i < e->sprite_count)
+	{
+		e->sprite[i].distance = ((e->pos.x - e->sprite[i].pos.x) *
+			(e->pos.x - e->sprite[i].pos.x) + (e->pos.y - e->sprite[i].pos.y) *
+			(e->pos.y - e->sprite[i].pos.y));
+	}
+	sprite_sort(e->sprite, e->sprite_count);
+}
 
 int				create_new_sprite(t_env *e, int i, int j, int type)
 {
@@ -41,6 +75,7 @@ void			sprite_cast(t_env *e, t_raycast *r)
 	t_rgba		color;
 	SDL_Surface	*selected_sprite;
 
+	update_sprite_pos(e);
 	for(int i = 0; i < e->sprite_count; i++)
 	{
 		if (e->sprite[i].sprite == PROP_LAMP)
