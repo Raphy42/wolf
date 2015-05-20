@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/20 09:06:55 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/20 15:09:48 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/20 15:12:02 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ static void				print_score(t_env *e, int score, int x, int y)
 static void				print_gun(t_env *e)
 {
 	SDL_Rect			src;
-	const SDL_Rect		dest = {870, 710, 900, 800};
+	const SDL_Rect		dest = {870, 710, 30, 30};
 
 	src.x = e->player.selected_weapon * 49;
 	src.y = 0;
