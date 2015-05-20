@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 04:14:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/19 01:40:14 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/20 09:17:47 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,7 +150,7 @@ void		draw(t_env *e)
 	SDL_Surface *selected_surface;
 
 	x = -1;
-	r.h = WIN_Y;
+	r.h = WIN_RAY_Y;
 	r.w = WIN_X;
 	while (++x < r.w)
 	{

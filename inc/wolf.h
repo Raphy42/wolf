@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 14:44:00 by leboheader        #+#    #+#             */
-/*   Updated: 2015/05/19 12:15:51 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/20 15:02:16 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,12 @@
 # define SPRITE_DB		"spritedb"
 # define MAP			singleton_map();
 # define M				e->map
-# define WIN_X			800
-# define WIN_Y			600
+# define WIN_X			1200
+# define WIN_Y			800
+# define WIN_RAY_Y		(WIN_Y - 150)
 # define TEX_WIDTH		512
 # define TEX_HEIGHT		512
+# define PORTRAIT		503, 20, 614, 134
 # define KEY			e->event.key.keysym.sym
 
 typedef enum			e_texture_type
@@ -39,9 +41,21 @@ typedef enum			e_texture_type
 	PROP_SKULLPILE,
 	PROP_ARMOR,
 	PROP_LAMP,
+	PROP_PILLAR,
 	COLLEC_JEWELBOX,
-	HUD_MAIN
+	HUD_MAIN,
+	HUD_BJ_FACE,
+	HUD_NUMBER,
+	HUD_GUN
 }						t_texture_type;
+
+typedef struct			s_player
+{
+	int					score;
+	int					health;
+	int					selected_weapon;
+	int					ammo;
+}						t_player;
 
 typedef struct			s_key
 {
@@ -142,13 +156,18 @@ typedef struct			s_env
 	SDL_Surface			*prop_skullpile;
 	SDL_Surface			*prop_armor;
 	SDL_Surface			*prop_lamp;
+	SDL_Surface			*prop_pillar;
 	SDL_Surface			*collec_jewelbox;
+	SDL_Texture			*hud_bj_face;
+	SDL_Texture			*hud_number;
+	SDL_Texture			*hud_gun;
 	SDL_Texture			*hud;
 	SDL_Texture			*img;
 	Uint32				*img_buffer;
 	t_key				key;
 	t_sprite			sprite[256];
 	int					sprite_count;
+	t_player			player;
 }						t_env;
 
 Uint32					create_color(int r, int g, int b);
@@ -162,5 +181,6 @@ void					create_texture_array(t_env *e);
 int						check_prop_collide(t_env *e);
 void					sprite_cast(t_env *e, t_raycast *r);
 int						create_new_sprite(t_env *e, int i, int j, int type);
+void					draw_hud(t_env *e);
 
 #endif

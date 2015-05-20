@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 16:31:55 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/18 09:07:24 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/20 15:01:41 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,12 @@ const t_texture_descriptor		g_textures[] = {
 	{PROP_SKULLPILE, "skullpile.bmp"},
 	{PROP_ARMOR, "armor.bmp"},
 	{PROP_LAMP, "lamp.bmp"},
+	{PROP_PILLAR, "pillar.bmp"},
 	{COLLEC_JEWELBOX, "jewelbox.bmp"},
-	{HUD_MAIN, "hud.bmp"}
+	{HUD_MAIN, "hud.bmp"},
+	{HUD_BJ_FACE, "hud_bj_face.bmp"},
+	{HUD_NUMBER, "hud_number.bmp"},
+	{HUD_GUN, "hud_gun.bmp"}
 };
 
 SDL_Surface			*load_texture(t_texture_type name)
@@ -57,6 +61,10 @@ void				create_texture_array(t_env *e)
 	e->collec_jewelbox = load_texture(COLLEC_JEWELBOX);
 	e->wall_wood_paint = load_texture(WALL_WOOD_PAINT);
 	e->hud = SDL_CreateTextureFromSurface(e->render, load_texture(HUD_MAIN));
+	e->hud_bj_face = SDL_CreateTextureFromSurface(e->render, load_texture(HUD_BJ_FACE));
+	e->prop_pillar = load_texture(PROP_PILLAR);
+	e->hud_number = SDL_CreateTextureFromSurface(e->render, load_texture(HUD_NUMBER));
+	e->hud_gun = SDL_CreateTextureFromSurface(e->render, load_texture(HUD_GUN));
 }
 
 int					check_prop_collide(t_env *e)
@@ -68,7 +76,10 @@ int					check_prop_collide(t_env *e)
 	{
 		if ((int)e->pos.x == (int)e->sprite[i].pos.x && (int)e->pos.y == (int)e->sprite[i].pos.y &&
 			e->sprite[i].pick_up)
+		{
 			e->sprite[i].pick_up = 0;
+			e->player.score += e->sprite[i].value;
+		}
 	}
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:25:07 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/18 05:32:53 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/20 14:50:07 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,7 @@ void				init(t_env *e)
 	e->dir.y = 0;
 	e->plane.y = 0.66;
 	e->plane.x = 0;
+	e->player.health = 100;
 	create_img_buffer(e);
 	convert_map(e);
 }

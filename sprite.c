@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/18 05:31:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/19 12:15:14 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/20 14:15:13 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,20 +15,23 @@
 void			sprite_sort(t_sprite *sprite, int n)
 {
 	t_sprite	swap;
-	int en_desordre = 1;
-	int i,j;
+	int			unsorted;
+	int			i;
+	int			j;
  
-	for (i = 0; (i < n) && en_desordre; ++i)
+ 	unsorted = 1;
+ 	i = -1;
+ 	while (++i < n && unsorted)
 	{
-		en_desordre = 0;
+		unsorted = 0;
 		for (j = 1; j < (n - i); ++j)
 		{
-			if (sprite[j-1].distance <= sprite[j].distance)
+			if (sprite[j - 1].distance <= sprite[j].distance)
 			{
-				swap = sprite[j-1];
-				sprite[j-1] = sprite[j];
+				swap = sprite[j - 1];
+				sprite[j - 1] = sprite[j];
 				sprite[j] = swap;
-				en_desordre = 1;
+				unsorted = 1;
  			}
 		}
 	}
@@ -63,11 +66,14 @@ int				create_new_sprite(t_env *e, int i, int j, int type)
 		e->sprite[k].sprite = PROP_LAMP;
 	else if (type == 'J')
 		e->sprite[k].sprite = COLLEC_JEWELBOX;
+	else if (type == 'P')
+		e->sprite[k].sprite = PROP_PILLAR;
 	e->sprite[k].pos.x = i + .5;
 	e->sprite[k].pos.y = j + .5;
-	e->sprite[k].obstacle = (type == 'B' || type == 'A') ? 1 : 0;
+	e->sprite[k].obstacle = (type == 'B' || type == 'A' || type == 'P') ? 1 : 0;
 	e->sprite[k].destroy = 0;
 	e->sprite[k].pick_up = (type == 'J');
+	e->sprite[k].value = (type == 'J') ? 500 : 0;
 	e->sprite_count++;
 	return (-e->sprite[k].obstacle);
 }
@@ -94,6 +100,8 @@ void			sprite_cast(t_env *e, t_raycast *r)
 			if (e->sprite[i].pick_up == 0)
 				continue ;
 		}
+		else if (e->sprite[i].sprite == PROP_PILLAR)
+			selected_sprite = e->prop_pillar;
 		double spriteX = e->sprite[i].pos.x - e->pos.x;
 		double spriteY = e->sprite[i].pos.y - e->pos.y;
 		double invDet = 1.0 / (e->plane.x * e->dir.y - e->dir.x * e->plane.y); //required for correct matrix multiplication
