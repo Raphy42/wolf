@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 04:14:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/22 01:42:30 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/22 06:12:36 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,8 @@ void				floor_cast(t_env *e, t_raycast *r, int x)
 		f.floor_tex_x = (int)(f.current_floor.x * TEX_WIDTH) % TEX_WIDTH;
 		f.floor_tex_y = (int)(f.current_floor.y * TEX_HEIGHT) % TEX_HEIGHT;
 		selected_surface = e->wall_wood;
+		if (e->player.life == 0)
+			selected_surface = e->game_over;
 		checker = ((int)f.current_floor.x + (int)f.current_floor.y) % 2;
 		if(checker == 0)
 			color = ((t_rgba *)selected_surface->pixels)[TEX_WIDTH * f.floor_tex_y + f.floor_tex_x];
@@ -185,6 +187,8 @@ void		draw(t_env *e)
 			selected_surface = e->wall_bluestone_jail;
 		else if (wall_type == 6)
 			selected_surface = e->wall_wood_paint;
+		if (e->player.life == 0)
+			selected_surface = e->game_over;
 		if (r.side == 0)
 			r.perp_wall_dist = fabs((r.map_x - r.ray_pos.x + (1 - r.step_x) / 2) / r.ray_dir.x);
 		else

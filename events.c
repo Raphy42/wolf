@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:07:27 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/21 23:10:27 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/22 06:14:10 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,22 @@ static void		kill_all(t_env *e)
 
 void			event(t_env *e)
 {
+	if (e->player.hit)
+		e->player.hit = 0;
+	if (e->player.health <= 0 && e->player.life > 0)
+	{
+		e->player.life--;
+		e->player.health = 100;
+		e->pos.x = DEFAULT_POS_X;
+		e->pos.y = DEFAULT_POS_Y;
+	}
+	if (e->player.life == 0)
+	{
+		e->player.hit = 1;
+		e->player.health = 0;
+		if (KEY != 27)
+			return ;
+	}
     if (e->event.type == SDL_KEYDOWN)
     {
         if (KEY == 27)
@@ -39,11 +55,11 @@ void			event(t_env *e)
             e->key.down = 1;
         else if (KEY == SDLK_TAB)
         	e->player.selected_weapon++;
-        else if (KEY == SDLK_x)
+        else if (KEY == SDLK_x && e->player.weapon_state <= 5)
         {
-        	e->player.weapon_state++;
+        	e->player.weapon_state = (6 - e->player.selected_weapon) * 5;
         	add_new_sprite(&e->sprite, create_new_sprite(e, e->pos.x, e->pos.y, PARTICULE_BULLET));
-        }
+		}
 		return ;
     }
     else if (e->event.type == SDL_KEYUP)
@@ -56,10 +72,6 @@ void			event(t_env *e)
             e->key.up = 0;
         else if (KEY == SDLK_DOWN)
             e->key.down = 0;
-        else if (KEY == SDLK_x)
-        	e->player.weapon_state--;
-        else
-            return ;
     }
 }
 

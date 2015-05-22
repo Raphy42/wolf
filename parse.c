@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:25:07 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/22 01:43:16 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/22 06:03:26 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,11 +69,11 @@ static void			convert_map(t_env *e)
 			if (e->level[i][j] == 9)
 			{
 				e->level[i][j] = 0;
-				e->pos.x = i;
-				e->pos.y = j;
+				e->default_pos.x = i;
+				e->default_pos.y = j;
 			}
 			if (ft_isalpha(map[i][j]))
-				e->level[i][j] = add_new_sprite(&e->sprite, create_new_sprite(e, i, j, map[i][j]));
+				e->level[i][j] = add_new_sprite(&e->sprite, create_new_sprite(e, i, j, get_texture_type(map[i][j])));
 			ft_fprintf(1, "%s", e->level[i][j] == 0 ? " " : "\u2593");
 		}
 		ft_fprintf(1, "\n");
@@ -106,15 +106,15 @@ void				init(t_env *e)
 	e->render = SDL_CreateRenderer(e->window, -1, SDL_RENDERER_ACCELERATED);
 	SDL_SetRenderDrawColor(e->render, 0, 0 ,0, 1);
 	SDL_RenderClear(e->render);
-	e->pos.x = 2;
-	e->pos.y = 2;
 	e->dir.x = -1;
 	e->dir.y = 0;
 	e->plane.y = 0.66;
 	e->plane.x = 0;
 	e->player.health = 100;
+	e->player.life = 3;
 	e->sprite = (t_sprite *)malloc(sizeof(t_sprite));
 	ft_bzero(e->sprite, sizeof(t_sprite));
 	create_img_buffer(e);
 	convert_map(e);
+	e->pos = e->default_pos;
 }

@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/20 09:06:55 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/20 20:14:25 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/22 06:18:36 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,13 +48,16 @@ static void				print_gun(t_env *e)
 	SDL_Rect			src;
 	const SDL_Rect		dest = {940, 670, 200, 110};
 	const SDL_Rect		middle_dest = {WIN_X / 2 - 256, WIN_RAY_Y - 512, 512, 512};
+	int					*anim;
 
+	anim = &e->player.weapon_state;
+	*anim += (*anim > 1) ? -1 : 0; 
 	src.x = e->player.selected_weapon * 49;
 	src.y = 0;
 	src.w = 49;
 	src.h = 26;
 	SDL_RenderCopy(e->render, e->hud_gun, &src, &dest);
-	src.x = (e->player.weapon_state + 1) % 4 * 64;
+	src.x = *anim / 5 * 64;
 	src.y = e->player.selected_weapon * 64 + e->player.selected_weapon;
 	src.w = 64;
 	src.h = 64;
@@ -68,7 +71,7 @@ static void				update_bj_face(t_env *e)
 	int					offset;
 	int					index;
 
-	offset = 5 - e->player.health / 20;
+	offset = 8 - e->player.health / 100 / 8;
 	index = e->key.left ? 0: 1;
 	index = e->key.right ? 2: index;
 	face.x = WIN_X / 2 - 100;
@@ -92,7 +95,7 @@ void					draw_hud(t_env *e)
 	print_score(e, e->player.health, 700, 710);
 	print_score(e, e->player.score, 325, 710);
 	print_score(e, 1, 130, 710);
-	print_score(e, 3, 450, 710);
+	print_score(e, e->player.life, 450, 710);
 	print_score(e, e->player.ammo, 870, 710);
 	print_gun(e);
 }

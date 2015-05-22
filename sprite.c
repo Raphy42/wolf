@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/18 05:31:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/22 02:01:58 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/22 06:17:21 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,22 +92,24 @@ void			update_sprite_pos(t_env *e)
 	tmp = e->sprite;
 	while (tmp->next != NULL)
 	{
-		tmp->pos.x += tmp->dir.x;
-		tmp->pos.y += tmp->dir.y;
 		if (tmp->sprite == PARTICULE_BULLET)
 		{
 			if (e->level[(int)(tmp->pos.x + tmp->dir.x)]
 				[(int)(tmp->pos.y + tmp->dir.y)])
 			{
 				tmp->value = 5;
+				tmp->dir.x = 0;
+				tmp->dir.y = 0;
 				tmp->sprite = PARTICULE_EXPLOSION;
-			}
-			else
-			{
-				tmp->pos.x += tmp->dir.x;
-				tmp->pos.y += tmp->dir.y;
+				if ((int)tmp->pos.x == (int)e->pos.x && (int)tmp->pos.y == (int)e->pos.y)
+				{
+					e->player.health -= 50;
+					e->player.hit = 1;
+				}
 			}
 		}
+		tmp->pos.x += tmp->dir.x;
+		tmp->pos.y += tmp->dir.y;
 		tmp->distance = ((e->pos.x - tmp->pos.x) *
 			(e->pos.x - tmp->pos.x) + (e->pos.y - tmp->pos.y) *
 			(e->pos.y - tmp->pos.y));
@@ -138,19 +140,16 @@ t_sprite		*create_new_sprite(t_env *e, int i, int j, int type)
 
 	new = (t_sprite *)malloc(sizeof(t_sprite));
 	ft_bzero(new, sizeof(t_sprite));
-	new->sprite = get_texture_type(type);
-	new->pos.x = i + (new->sprite == PARTICULE_BULLET ? e->dir.x : 0.5);
-	new->pos.y = j + (new->sprite == PARTICULE_BULLET ? e->dir.x : 0.5);
-	new->obstacle = (type == 'B' || type == 'A' || type == 'P') ? 1 : 0;
+	new->sprite = type;
+	if (new->sprite == PARTICULE_BULLET)
+		new->dir = e->dir;
+	new->pos.x = i + .5;
+	new->pos.y = j + .5;
+	new->obstacle = (new->sprite == PROP_BARREL ||
+		new->sprite == PROP_ARMOR || new->sprite == PROP_PILLAR) ? 1 : 0;
 	new->destroy = 0;
 	new->pick_up = (new->sprite == COLLEC_JEWELBOX);
 	new->value = (new->sprite == COLLEC_JEWELBOX) ? 500 : 0;
-	if (new->sprite == PARTICULE_BULLET)
-	{
-		new->dir.x = e->dir.x;
-		new->dir.y = e->dir.y;
-	}
-	ft_fprintf(1, "created new sprite %d\n", new->sprite);
 	return (new);
 }
 
@@ -186,16 +185,6 @@ SDL_Surface		*select_sprite(t_sprite *s, t_env *e)
 	return (NULL);
 }
 
-static void		print_sprite(t_env *e)
-{
-	t_sprite	*tmp = e->sprite;
-	while (tmp->next != NULL)
-	{
-		ft_fprintf(1, "e->sprite.distance == %d type %d\n", tmp->distance, tmp->sprite);
-		tmp = tmp->next;
-	}
-}
-
 int				get_texture_type(int type)
 {
 	if (type == 'A')
@@ -220,14 +209,14 @@ void			sprite_cast(t_env *e, t_raycast *r)
 	t_sprite	*s;
 
 	s = e->sprite;
-	print_sprite(e);
 	update_sprite_pos(e);
-	print_sprite(e);
 	while (s->next != NULL)
 	{
-		ft_fprintf(1, "%dm %dtype\r", s->distance, s->sprite);
 		if ((selected_sprite = select_sprite(s, e)) == NULL)
-			selected_sprite = e->surface_error;
+		{
+			s = s->next;
+			continue ;
+		}
 		double spriteX = s->pos.x - e->pos.x;
 		double spriteY = s->pos.y - e->pos.y;
 		double invDet = 1.0 / (e->plane.x * e->dir.y - e->dir.x * e->plane.y);

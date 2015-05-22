@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 16:26:27 by lejoliwolf3d      #+#    #+#             */
-/*   Updated: 2015/05/22 01:42:26 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/22 05:57:13 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,10 @@ int					main(void)
 		run_event(&e);
 		draw(&e);
 		SDL_UpdateTexture(e.img, NULL, e.img_buffer, WIN_X * sizeof(Uint32));
+		if (e.player.hit)
+			SDL_SetTextureColorMod(e.img, 255 - (100 - e.player.health), 0, 0);
+		else
+			SDL_SetTextureColorMod(e.img, 255, 255, 255);
 		SDL_RenderCopy(e.render, e.img, NULL, NULL);
 		draw_hud(&e);
 		SDL_RenderPresent(e.render);

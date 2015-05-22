@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 14:44:00 by leboheader        #+#    #+#             */
-/*   Updated: 2015/05/22 01:58:31 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/22 06:08:08 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@
 # define TEX_HEIGHT		512
 # define PORTRAIT		503, 20, 614, 134
 # define KEY			e->event.key.keysym.sym
+# define DEFAULT_POS_X	e->default_pos.x;
+# define DEFAULT_POS_Y	e->default_pos.y;
 
 typedef enum			e_texture_type
 {
@@ -50,16 +52,19 @@ typedef enum			e_texture_type
 	WEAPON_ALL,
 	PARTICULE_BULLET,
 	PARTICULE_EXPLOSION,
-	SURFACE_ERROR
+	SURFACE_ERROR,
+	GAME_OVER
 }						t_texture_type;
 
 typedef struct			s_player
 {
 	int					score;
 	int					health;
+	int					life;
 	int					selected_weapon;
 	int					weapon_state;
 	int					ammo;
+	int					hit;
 }						t_player;
 
 typedef struct			s_key
@@ -143,6 +148,7 @@ typedef struct			s_env
 	double				time_start;
 	double				time_end;
 	double				frame_time;
+	t_pos				default_pos;
 	t_pos				pos;
 	t_pos				dir;
 	t_pos				plane;
@@ -168,6 +174,8 @@ typedef struct			s_env
 	SDL_Surface			*particule_bullet;
 	SDL_Surface			*particule_explosion;
 	SDL_Surface			*surface_error;
+	SDL_Surface			*game_over;
+	SDL_Texture			*red_damage;
 	SDL_Texture			*hud_bj_face;
 	SDL_Texture			*hud_number;
 	SDL_Texture			*hud_gun;

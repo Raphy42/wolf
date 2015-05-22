@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 16:31:55 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/22 00:23:37 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/22 06:08:52 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,10 @@ const t_texture_descriptor		g_textures[] = {
 	{HUD_NUMBER, "hud_number.bmp"},
 	{HUD_GUN, "hud_gun.bmp"},
 	{WEAPON_ALL, "weapon_all.bmp"},
-	{PARTICULE_BULLET, "jvolonda.bmp"},
+	{PARTICULE_BULLET, "bullet.bmp"},
 	{PARTICULE_EXPLOSION, "explosion.bmp"},
-	{SURFACE_ERROR, "error.bmp"}
+	{SURFACE_ERROR, "error.bmp"},
+	{GAME_OVER, "game_over.bmp"}
 };
 
 SDL_Surface			*load_texture(t_texture_type name)
@@ -78,6 +79,7 @@ void				create_texture_array(t_env *e)
 	e->particule_bullet = load_texture(PARTICULE_BULLET);
 	e->particule_explosion = load_texture(PARTICULE_EXPLOSION);
 	e->surface_error = load_texture(SURFACE_ERROR);
+	e->game_over = load_texture(GAME_OVER);
 }
 
 void				check_prop_collide(t_env *e)
@@ -87,8 +89,8 @@ void				check_prop_collide(t_env *e)
 	tmp = e->sprite;
 	while (tmp->next != NULL)
 	{
-		if (((int)e->pos.x == (int)tmp->pos.x) && ((int)e->pos.y == (int)tmp->pos.y &&
-			tmp->pick_up))
+		if (((int)e->pos.x == (int)tmp->pos.x) && ((int)e->pos.y ==
+			(int)tmp->pos.y && tmp->pick_up))
 		{
 			tmp->pick_up = 0;
 			e->player.score += tmp->value;
