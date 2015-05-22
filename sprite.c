@@ -6,109 +6,235 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/18 05:31:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/20 14:15:13 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/22 02:01:58 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "wolf.h"
 
-void			sprite_sort(t_sprite *sprite, int n)
+static void		list_split(t_sprite *src, t_sprite **front_ref, t_sprite **back_ref)
 {
-	t_sprite	swap;
-	int			unsorted;
-	int			i;
-	int			j;
- 
- 	unsorted = 1;
- 	i = -1;
- 	while (++i < n && unsorted)
+	t_sprite	*fast;
+	t_sprite	*slow;
+
+	if (src == NULL || src->next == NULL)
 	{
-		unsorted = 0;
-		for (j = 1; j < (n - i); ++j)
-		{
-			if (sprite[j - 1].distance <= sprite[j].distance)
-			{
-				swap = sprite[j - 1];
-				sprite[j - 1] = sprite[j];
-				sprite[j] = swap;
-				unsorted = 1;
- 			}
-		}
+		*front_ref = src;
+		*back_ref = NULL;
 	}
+	else
+	{
+		slow = src;
+		fast = src->next;
+		while (fast != NULL)
+		{
+			fast = fast->next;
+			if (fast != NULL)
+			{
+				slow = slow->next;
+				fast = fast->next;
+			}
+		}
+		*front_ref = src;
+		*back_ref = slow->next;
+		slow->next = NULL;
+	}
+}
+
+static t_sprite		*sort_list(t_sprite *a, t_sprite *b, int (*f)(t_sprite *a, t_sprite *b))
+{
+	t_sprite	*result;
+
+	result = NULL;
+	if (a == NULL)
+		return (b);
+	else if (b == NULL)
+		return (a);
+	if ((*f)(a, b))
+	{
+		result = a;
+		result->next = sort_list(a->next, b, (*f));
+	}
+	else
+	{
+		result = b;
+		result->next = sort_list(a, b->next, (*f));
+	}
+	return (result);
+}
+
+static void		merge_sort(t_sprite **head_ref, int (*f)(t_sprite *a, t_sprite *b))
+{
+	t_sprite	*head;
+	t_sprite	*a;
+	t_sprite	*b;
+
+	head = *head_ref;
+	if ((head == NULL) || (head->next == NULL))
+		return ;
+	list_split(head, &a, &b);
+	merge_sort(&a, (*f));
+	merge_sort(&b, (*f));
+	*head_ref = sort_list(a, b, (*f));
+}
+
+static int		sort_sprite_by_distance(t_sprite *a, t_sprite *b)
+{
+	return ((a->distance >= b->distance));
 }
 
 void			update_sprite_pos(t_env *e)
 {
 	int			i;
+	t_sprite	*tmp;
 
 	i = -1;
-	while (++i < e->sprite_count)
+	tmp = e->sprite;
+	while (tmp->next != NULL)
 	{
-		e->sprite[i].distance = ((e->pos.x - e->sprite[i].pos.x) *
-			(e->pos.x - e->sprite[i].pos.x) + (e->pos.y - e->sprite[i].pos.y) *
-			(e->pos.y - e->sprite[i].pos.y));
+		tmp->pos.x += tmp->dir.x;
+		tmp->pos.y += tmp->dir.y;
+		if (tmp->sprite == PARTICULE_BULLET)
+		{
+			if (e->level[(int)(tmp->pos.x + tmp->dir.x)]
+				[(int)(tmp->pos.y + tmp->dir.y)])
+			{
+				tmp->value = 5;
+				tmp->sprite = PARTICULE_EXPLOSION;
+			}
+			else
+			{
+				tmp->pos.x += tmp->dir.x;
+				tmp->pos.y += tmp->dir.y;
+			}
+		}
+		tmp->distance = ((e->pos.x - tmp->pos.x) *
+			(e->pos.x - tmp->pos.x) + (e->pos.y - tmp->pos.y) *
+			(e->pos.y - tmp->pos.y));
+		tmp = tmp->next;
 	}
-	sprite_sort(e->sprite, e->sprite_count);
+	merge_sort(&e->sprite, &sort_sprite_by_distance);
 }
 
-int				create_new_sprite(t_env *e, int i, int j, int type)
+int			add_new_sprite(t_sprite **head, t_sprite *new)
 {
-	int			k;
+	t_sprite	*tmp;
 
-	k = e->sprite_count;
-	if (type == 'B')
-		e->sprite[k].sprite = PROP_BARREL;
-	else if (type == 'S')
-		e->sprite[k].sprite = PROP_SKULLPILE;
-	else if (type == 'A')
-		e->sprite[k].sprite = PROP_ARMOR;
-	else if (type == 'L')
-		e->sprite[k].sprite = PROP_LAMP;
+	tmp = (*head);
+	if (tmp == NULL)
+		(*head) = new;
+	else
+	{
+		while (tmp->next != NULL)
+			tmp = tmp->next;
+		tmp->next = new;
+	}
+	return (-new->obstacle);
+}
+
+t_sprite		*create_new_sprite(t_env *e, int i, int j, int type)
+{
+	t_sprite	*new;
+
+	new = (t_sprite *)malloc(sizeof(t_sprite));
+	ft_bzero(new, sizeof(t_sprite));
+	new->sprite = get_texture_type(type);
+	new->pos.x = i + (new->sprite == PARTICULE_BULLET ? e->dir.x : 0.5);
+	new->pos.y = j + (new->sprite == PARTICULE_BULLET ? e->dir.x : 0.5);
+	new->obstacle = (type == 'B' || type == 'A' || type == 'P') ? 1 : 0;
+	new->destroy = 0;
+	new->pick_up = (new->sprite == COLLEC_JEWELBOX);
+	new->value = (new->sprite == COLLEC_JEWELBOX) ? 500 : 0;
+	if (new->sprite == PARTICULE_BULLET)
+	{
+		new->dir.x = e->dir.x;
+		new->dir.y = e->dir.y;
+	}
+	ft_fprintf(1, "created new sprite %d\n", new->sprite);
+	return (new);
+}
+
+SDL_Surface		*select_sprite(t_sprite *s, t_env *e)
+{
+	if (s->sprite == PROP_LAMP)
+		return (e->prop_lamp);
+	else if (s->sprite == PROP_BARREL)
+		return (e->prop_barrel);
+	else if (s->sprite == PROP_ARMOR)
+		return (e->prop_armor);
+	else if (s->sprite == PROP_SKULLPILE)
+		return (e->prop_skullpile);
+	else if (s->sprite == COLLEC_JEWELBOX)
+	{
+		if (s->pick_up == 0)
+			return (NULL);
+		return (e->collec_jewelbox);
+	}
+	else if (s->sprite == PROP_PILLAR)
+		return (e->prop_pillar);
+	else if (s->sprite == PARTICULE_BULLET)
+		return (e->particule_bullet);
+	else if (s->sprite == PARTICULE_EXPLOSION)
+	{
+		if (s->value == 0)
+			return (NULL);
+		s->value--;
+		return (e->particule_explosion);
+	}
+	else if (s->sprite < PROP_BARREL || s->sprite > PARTICULE_EXPLOSION)
+		return (e->surface_error);
+	return (NULL);
+}
+
+static void		print_sprite(t_env *e)
+{
+	t_sprite	*tmp = e->sprite;
+	while (tmp->next != NULL)
+	{
+		ft_fprintf(1, "e->sprite.distance == %d type %d\n", tmp->distance, tmp->sprite);
+		tmp = tmp->next;
+	}
+}
+
+int				get_texture_type(int type)
+{
+	if (type == 'A')
+		return (PROP_ARMOR);
+	else if (type == 'B')
+		return (PROP_BARREL);
 	else if (type == 'J')
-		e->sprite[k].sprite = COLLEC_JEWELBOX;
+		return (COLLEC_JEWELBOX);
+	else if (type == 'L')
+		return (PROP_LAMP);
 	else if (type == 'P')
-		e->sprite[k].sprite = PROP_PILLAR;
-	e->sprite[k].pos.x = i + .5;
-	e->sprite[k].pos.y = j + .5;
-	e->sprite[k].obstacle = (type == 'B' || type == 'A' || type == 'P') ? 1 : 0;
-	e->sprite[k].destroy = 0;
-	e->sprite[k].pick_up = (type == 'J');
-	e->sprite[k].value = (type == 'J') ? 500 : 0;
-	e->sprite_count++;
-	return (-e->sprite[k].obstacle);
+		return (PROP_PILLAR);
+	else if (type == 'S')
+		return (PROP_SKULLPILE);
+	return (SURFACE_ERROR);
 }
 
 void			sprite_cast(t_env *e, t_raycast *r)
 {
 	t_rgba		color;
 	SDL_Surface	*selected_sprite;
+	t_sprite	*s;
 
+	s = e->sprite;
+	print_sprite(e);
 	update_sprite_pos(e);
-	for(int i = 0; i < e->sprite_count; i++)
+	print_sprite(e);
+	while (s->next != NULL)
 	{
-		if (e->sprite[i].sprite == PROP_LAMP)
-			selected_sprite = e->prop_lamp;
-		else if (e->sprite[i].sprite == PROP_BARREL)
-			selected_sprite = e->prop_barrel;
-		else if (e->sprite[i].sprite == PROP_ARMOR)
-			selected_sprite = e->prop_armor;
-		else if (e->sprite[i].sprite == PROP_SKULLPILE)
-			selected_sprite = e->prop_skullpile;
-		else if (e->sprite[i].sprite == COLLEC_JEWELBOX)
-		{
-			selected_sprite = e->collec_jewelbox;
-			if (e->sprite[i].pick_up == 0)
-				continue ;
-		}
-		else if (e->sprite[i].sprite == PROP_PILLAR)
-			selected_sprite = e->prop_pillar;
-		double spriteX = e->sprite[i].pos.x - e->pos.x;
-		double spriteY = e->sprite[i].pos.y - e->pos.y;
-		double invDet = 1.0 / (e->plane.x * e->dir.y - e->dir.x * e->plane.y); //required for correct matrix multiplication
+		ft_fprintf(1, "%dm %dtype\r", s->distance, s->sprite);
+		if ((selected_sprite = select_sprite(s, e)) == NULL)
+			selected_sprite = e->surface_error;
+		double spriteX = s->pos.x - e->pos.x;
+		double spriteY = s->pos.y - e->pos.y;
+		double invDet = 1.0 / (e->plane.x * e->dir.y - e->dir.x * e->plane.y);
 		double transformX = invDet * (e->dir.y * spriteX - e->dir.x * spriteY);
-		double transformY = invDet * (-e->plane.y * spriteX + e->plane.x * spriteY); //this is actually the depth inside the screen, that what Z is in 3D       
+		double transformY = invDet * (-e->plane.y * spriteX + e->plane.x * spriteY);
 		int spriteScreenX = (int)((r->w / 2) * (1 + transformX / transformY));
-		int spriteHeight = abs((int)(r->h / (transformY))); //using "transformY" instead of the real distance prevents fisheye
+		int spriteHeight = abs((int)(r->h / (transformY)));
 		int drawStartY = -spriteHeight / 2 + r->h / 2;
 		if(drawStartY < 0)
 			drawStartY = 0;
@@ -129,11 +255,12 @@ void			sprite_cast(t_env *e, t_raycast *r)
 			for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
 			{
 				int d = (y) * 256 - r->h * 128 + spriteHeight * 128; //256 and 128 factors to avoid doubles
-				int texY = ((d * e->prop_barrel->h) / spriteHeight) / 256;
+				int texY = ((d * selected_sprite->h) / spriteHeight) / 256;
 				color = ((t_rgba *)selected_sprite->pixels)[selected_sprite->w * texY + texX];
 				if (!(color.r == 255 && color.g == 0 && color.b == 255))
 					e->img_buffer[WIN_X * y + stripe] = create_color(color.b, color.g, color.r);
 			}
 		}
+		s = s->next;
 	}
 }

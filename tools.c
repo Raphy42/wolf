@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 16:31:55 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/20 15:01:41 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/22 00:23:37 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,11 @@ const t_texture_descriptor		g_textures[] = {
 	{HUD_MAIN, "hud.bmp"},
 	{HUD_BJ_FACE, "hud_bj_face.bmp"},
 	{HUD_NUMBER, "hud_number.bmp"},
-	{HUD_GUN, "hud_gun.bmp"}
+	{HUD_GUN, "hud_gun.bmp"},
+	{WEAPON_ALL, "weapon_all.bmp"},
+	{PARTICULE_BULLET, "jvolonda.bmp"},
+	{PARTICULE_EXPLOSION, "explosion.bmp"},
+	{SURFACE_ERROR, "error.bmp"}
 };
 
 SDL_Surface			*load_texture(t_texture_type name)
@@ -49,6 +53,8 @@ SDL_Surface			*load_texture(t_texture_type name)
 
 void				create_texture_array(t_env *e)
 {
+	SDL_Surface		*tmp;
+
 	e->wall_greystone = load_texture(WALL_GREYSTONE);
 	e->wall_colorstone = load_texture(WALL_COLORSTONE);
 	e->wall_wood = load_texture(WALL_WOOD);
@@ -65,22 +71,28 @@ void				create_texture_array(t_env *e)
 	e->prop_pillar = load_texture(PROP_PILLAR);
 	e->hud_number = SDL_CreateTextureFromSurface(e->render, load_texture(HUD_NUMBER));
 	e->hud_gun = SDL_CreateTextureFromSurface(e->render, load_texture(HUD_GUN));
+	tmp = load_texture(WEAPON_ALL);
+	Uint32 colorkey = SDL_MapRGB(tmp->format, 255, 0, 255);
+	SDL_SetColorKey(tmp, SDL_TRUE,colorkey);
+	e->weapon_all = SDL_CreateTextureFromSurface(e->render, tmp);
+	e->particule_bullet = load_texture(PARTICULE_BULLET);
+	e->particule_explosion = load_texture(PARTICULE_EXPLOSION);
+	e->surface_error = load_texture(SURFACE_ERROR);
 }
 
-int					check_prop_collide(t_env *e)
+void				check_prop_collide(t_env *e)
 {
-	int				i;
+	t_sprite		*tmp;
 
-	i = -1;
-	while (++i < e->sprite_count)
+	tmp = e->sprite;
+	while (tmp->next != NULL)
 	{
-		if ((int)e->pos.x == (int)e->sprite[i].pos.x && (int)e->pos.y == (int)e->sprite[i].pos.y &&
-			e->sprite[i].pick_up)
+		if (((int)e->pos.x == (int)tmp->pos.x) && ((int)e->pos.y == (int)tmp->pos.y &&
+			tmp->pick_up))
 		{
-			e->sprite[i].pick_up = 0;
-			e->player.score += e->sprite[i].value;
+			tmp->pick_up = 0;
+			e->player.score += tmp->value;
 		}
+		tmp = tmp->next;
 	}
-	return (0);
 }
-

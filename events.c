@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:07:27 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/20 14:49:52 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/21 23:10:27 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,12 @@ void			event(t_env *e)
         else if (KEY == SDLK_DOWN)
             e->key.down = 1;
         else if (KEY == SDLK_TAB)
-        	e->player.health--;
+        	e->player.selected_weapon++;
+        else if (KEY == SDLK_x)
+        {
+        	e->player.weapon_state++;
+        	add_new_sprite(&e->sprite, create_new_sprite(e, e->pos.x, e->pos.y, PARTICULE_BULLET));
+        }
 		return ;
     }
     else if (e->event.type == SDL_KEYUP)
@@ -51,6 +56,8 @@ void			event(t_env *e)
             e->key.up = 0;
         else if (KEY == SDLK_DOWN)
             e->key.down = 0;
+        else if (KEY == SDLK_x)
+        	e->player.weapon_state--;
         else
             return ;
     }

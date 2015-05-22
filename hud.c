@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/20 09:06:55 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/20 15:12:02 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/20 20:14:25 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,13 +46,19 @@ static void				print_score(t_env *e, int score, int x, int y)
 static void				print_gun(t_env *e)
 {
 	SDL_Rect			src;
-	const SDL_Rect		dest = {870, 710, 30, 30};
+	const SDL_Rect		dest = {940, 670, 200, 110};
+	const SDL_Rect		middle_dest = {WIN_X / 2 - 256, WIN_RAY_Y - 512, 512, 512};
 
 	src.x = e->player.selected_weapon * 49;
 	src.y = 0;
 	src.w = 49;
 	src.h = 26;
 	SDL_RenderCopy(e->render, e->hud_gun, &src, &dest);
+	src.x = (e->player.weapon_state + 1) % 4 * 64;
+	src.y = e->player.selected_weapon * 64 + e->player.selected_weapon;
+	src.w = 64;
+	src.h = 64;
+	SDL_RenderCopy(e->render, e->weapon_all, &src, &middle_dest);
 }
 
 static void				update_bj_face(t_env *e)

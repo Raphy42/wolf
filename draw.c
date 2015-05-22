@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 04:14:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/20 09:17:47 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/22 01:42:30 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ void				floor_cast(t_env *e, t_raycast *r, int x)
 		else
 			color = ((t_rgba *)selected_surface->pixels)[TEX_WIDTH * f.floor_tex_x + f.floor_tex_y];
 		e->img_buffer[WIN_X * y + x] = create_color(color.b, color.g, color.r);
-		e->img_buffer[WIN_X * (r->h - y) + x] = create_color(color.b, color.g, color.r);
+		//e->img_buffer[WIN_X * (r->h - y) + x] = create_color(color.b, color.g, color.r);
 	}
 }
 
@@ -158,7 +158,6 @@ void		draw(t_env *e)
 		hit = 0;
 		while (hit == 0)
 		{
-			//jump to next map square, OR in x-direction, OR in y-direction
 			if (r.side_dist.x < r.side_dist.y)
 			{
 				r.side_dist.x += r.delta_dist.x;

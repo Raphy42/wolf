@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 16:26:27 by lejoliwolf3d      #+#    #+#             */
-/*   Updated: 2015/05/20 11:58:37 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/22 01:42:26 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ int					main(void)
 	create_texture_array(&e);
 	while (1)
 	{
-	//	SDL_Delay(10);
 		ft_bzero(e.img_buffer, sizeof(Uint32) * WIN_X * WIN_Y);
 		e.time_start = e.time_end;
 		e.time_end = SDL_GetTicks();

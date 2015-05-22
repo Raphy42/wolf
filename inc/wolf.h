@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 14:44:00 by leboheader        #+#    #+#             */
-/*   Updated: 2015/05/20 15:02:16 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/22 01:58:31 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,11 @@ typedef enum			e_texture_type
 	HUD_MAIN,
 	HUD_BJ_FACE,
 	HUD_NUMBER,
-	HUD_GUN
+	HUD_GUN,
+	WEAPON_ALL,
+	PARTICULE_BULLET,
+	PARTICULE_EXPLOSION,
+	SURFACE_ERROR
 }						t_texture_type;
 
 typedef struct			s_player
@@ -54,6 +58,7 @@ typedef struct			s_player
 	int					score;
 	int					health;
 	int					selected_weapon;
+	int					weapon_state;
 	int					ammo;
 }						t_player;
 
@@ -86,13 +91,15 @@ typedef struct			s_pos
 
 typedef struct			s_sprite
 {
-	t_pos				pos;
 	t_texture_type		sprite;
+	t_pos				pos;
+	t_pos				dir;
 	int					obstacle;
 	int					destroy;
 	int					pick_up;
 	int					value;
 	int					distance;
+	struct s_sprite		*next;
 }						t_sprite;
 
 typedef struct			s_raycast
@@ -158,16 +165,20 @@ typedef struct			s_env
 	SDL_Surface			*prop_lamp;
 	SDL_Surface			*prop_pillar;
 	SDL_Surface			*collec_jewelbox;
+	SDL_Surface			*particule_bullet;
+	SDL_Surface			*particule_explosion;
+	SDL_Surface			*surface_error;
 	SDL_Texture			*hud_bj_face;
 	SDL_Texture			*hud_number;
 	SDL_Texture			*hud_gun;
+	SDL_Texture			*weapon_all;
 	SDL_Texture			*hud;
 	SDL_Texture			*img;
 	Uint32				*img_buffer;
 	t_key				key;
-	t_sprite			sprite[256];
-	int					sprite_count;
+	t_sprite			*sprite;
 	t_player			player;
+
 }						t_env;
 
 Uint32					create_color(int r, int g, int b);
@@ -178,9 +189,11 @@ void					init(t_env *e);
 void					draw(t_env *e);
 SDL_Surface				*load_texture(t_texture_type name);
 void					create_texture_array(t_env *e);
-int						check_prop_collide(t_env *e);
+void					check_prop_collide(t_env *e);
+int						add_new_sprite(t_sprite **head, t_sprite *new);
 void					sprite_cast(t_env *e, t_raycast *r);
-int						create_new_sprite(t_env *e, int i, int j, int type);
+t_sprite				*create_new_sprite(t_env *e, int i, int j, int type);
 void					draw_hud(t_env *e);
+int						get_texture_type(int type);
 
 #endif

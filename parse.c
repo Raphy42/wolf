@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:25:07 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/20 14:50:07 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/22 01:43:16 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,9 +73,7 @@ static void			convert_map(t_env *e)
 				e->pos.y = j;
 			}
 			if (ft_isalpha(map[i][j]))
-			{
-				e->level[i][j] = create_new_sprite(e, i, j, map[i][j]);
-			}
+				e->level[i][j] = add_new_sprite(&e->sprite, create_new_sprite(e, i, j, map[i][j]));
 			ft_fprintf(1, "%s", e->level[i][j] == 0 ? " " : "\u2593");
 		}
 		ft_fprintf(1, "\n");
@@ -115,6 +113,8 @@ void				init(t_env *e)
 	e->plane.y = 0.66;
 	e->plane.x = 0;
 	e->player.health = 100;
+	e->sprite = (t_sprite *)malloc(sizeof(t_sprite));
+	ft_bzero(e->sprite, sizeof(t_sprite));
 	create_img_buffer(e);
 	convert_map(e);
 }
