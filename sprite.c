@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/18 05:31:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/22 06:17:21 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/26 00:33:52 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,8 +143,8 @@ t_sprite		*create_new_sprite(t_env *e, int i, int j, int type)
 	new->sprite = type;
 	if (new->sprite == PARTICULE_BULLET)
 		new->dir = e->dir;
-	new->pos.x = i + .5;
-	new->pos.y = j + .5;
+	new->pos.x = i + (new->sprite != PARTICULE_BULLET ? .5 : 0);
+	new->pos.y = j + (new->sprite != PARTICULE_BULLET ? .5 : 0);
 	new->obstacle = (new->sprite == PROP_BARREL ||
 		new->sprite == PROP_ARMOR || new->sprite == PROP_PILLAR) ? 1 : 0;
 	new->destroy = 0;
@@ -207,6 +207,7 @@ void			sprite_cast(t_env *e, t_raycast *r)
 	t_rgba		color;
 	SDL_Surface	*selected_sprite;
 	t_sprite	*s;
+	t_spritecast	c;
 
 	s = e->sprite;
 	update_sprite_pos(e);
@@ -217,37 +218,37 @@ void			sprite_cast(t_env *e, t_raycast *r)
 			s = s->next;
 			continue ;
 		}
-		double spriteX = s->pos.x - e->pos.x;
-		double spriteY = s->pos.y - e->pos.y;
-		double invDet = 1.0 / (e->plane.x * e->dir.y - e->dir.x * e->plane.y);
-		double transformX = invDet * (e->dir.y * spriteX - e->dir.x * spriteY);
-		double transformY = invDet * (-e->plane.y * spriteX + e->plane.x * spriteY);
-		int spriteScreenX = (int)((r->w / 2) * (1 + transformX / transformY));
-		int spriteHeight = abs((int)(r->h / (transformY)));
-		int drawStartY = -spriteHeight / 2 + r->h / 2;
-		if(drawStartY < 0)
-			drawStartY = 0;
-		int drawEndY = spriteHeight / 2 + r->h / 2;
-		if(drawEndY >= r->h)
-			drawEndY = r->h - 1;
-		int spriteWidth = abs((int)(r->h / (transformY)));
-		int drawStartX = -spriteWidth / 2 + spriteScreenX;
-		if(drawStartX < 0)
-			drawStartX = 0;
-		int drawEndX = spriteWidth / 2 + spriteScreenX;
-		if(drawEndX >= r->w)
-			drawEndX = r->w - 1;
-		for(int stripe = drawStartX; stripe < drawEndX; stripe++)
+		c.pos.x = s->pos.x - e->pos.x;
+		c.pos.y = s->pos.y - e->pos.y;
+		c.inv_det = 1.0 / (e->plane.x * e->dir.y - e->dir.x * e->plane.y);
+		c.transform.x = c.inv_det * (e->dir.y * c.pos.x - e->dir.x * c.pos.y);
+		c.transform.y = c.inv_det * (-e->plane.y * c.pos.x + e->plane.x * c.pos.y);
+		c.sprite_screen_x = (int)((r->w / 2) * (1 + c.transform.x / c.transform.y));
+		c.sprite_height = abs((int)(r->h / (c.transform.y)));
+		c.draw_start_y = -c.sprite_height / 2 + r->h / 2;
+		if(c.draw_start_y < 0)
+			c.draw_start_y = 0;
+		c.draw_end_y = c.sprite_height / 2 + r->h / 2;
+		if(c.draw_end_y >= r->h)
+			c.draw_end_y = r->h - 1;
+		c.sprite_width = abs((int)(r->h / (c.transform.y)));
+		c.draw_start_x = -c.sprite_width / 2 + c.sprite_screen_x;
+		if(c.draw_start_x < 0)
+			c.draw_start_x = 0;
+		c.draw_end_x = c.sprite_width / 2 + c.sprite_screen_x;
+		if(c.draw_end_x >= r->w)
+			c.draw_end_x = r->w - 1;
+		for(c.stripe = c.draw_start_x; c.stripe < c.draw_end_x; c.stripe++)
 		{
-			int texX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * e->prop_barrel->w / spriteWidth) / 256;
-			if(transformY > 0 && stripe > 0 && stripe < r->w && transformY < r->z_buffer[stripe]) 
-			for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
+			c.tex_x = (int)(256 * (c.stripe - (-c.sprite_width / 2 + c.sprite_screen_x)) * e->prop_barrel->w / c.sprite_width) / 256;
+			if(c.transform.y > 0 && c.stripe > 0 && c.stripe < r->w && c.transform.y < r->z_buffer[c.stripe]) 
+			for(c.y = c.draw_start_y; c.y < c.draw_end_y; c.y++) //for every pixel of the current c.stripe
 			{
-				int d = (y) * 256 - r->h * 128 + spriteHeight * 128; //256 and 128 factors to avoid doubles
-				int texY = ((d * selected_sprite->h) / spriteHeight) / 256;
-				color = ((t_rgba *)selected_sprite->pixels)[selected_sprite->w * texY + texX];
+				c.d = (c.y) * 256 - r->h * 128 + c.sprite_height * 128; //256 and 128 factors to avoid doubles
+				c.tex_y = ((c.d * selected_sprite->h) / c.sprite_height) / 256;
+				color = ((t_rgba *)selected_sprite->pixels)[selected_sprite->w * c.tex_y + c.tex_x];
 				if (!(color.r == 255 && color.g == 0 && color.b == 255))
-					e->img_buffer[WIN_X * y + stripe] = create_color(color.b, color.g, color.r);
+					e->img_buffer[WIN_X * c.y + c.stripe] = create_color(color.b, color.g, color.r);
 			}
 		}
 		s = s->next;

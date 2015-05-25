@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 14:44:00 by leboheader        #+#    #+#             */
-/*   Updated: 2015/05/22 06:08:08 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/26 00:15:16 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 # include "SDL.h"
 
 # define MAP_PATH		"map1"
-# define SPRITE_DB		"spritedb"
 # define MAP			singleton_map();
 # define M				e->map
 # define WIN_X			1200
@@ -139,6 +138,25 @@ typedef struct			s_floorcast
 	int					floor_tex_x;
 	int					floor_tex_y;
 }						t_floorcast;
+
+typedef struct			s_spritecast
+{
+	t_pos				pos;
+	double				inv_det;
+	t_pos				transform;
+	int					sprite_screen_x;
+	int					sprite_height;
+	int					draw_start_x;
+	int					draw_start_y;
+	int					draw_end_x;
+	int					draw_end_y;
+	double				sprite_width;
+	int					stripe;
+	int					tex_x;
+	int					tex_y;
+	int					d;
+	int					y;
+}						t_spritecast;
 
 typedef struct			s_env
 {
