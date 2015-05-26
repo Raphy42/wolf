@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 14:44:00 by leboheader        #+#    #+#             */
-/*   Updated: 2015/05/26 00:15:16 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/26 05:56:55 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,9 @@
 # define KEY			e->event.key.keysym.sym
 # define DEFAULT_POS_X	e->default_pos.x;
 # define DEFAULT_POS_Y	e->default_pos.y;
+# define MIDDLE_DEST	WIN_X / 2 - 256, WIN_RAY_Y - 512, 512, 512
+# define LEVEL_TEST_X	e->level[(int)(e->pos.x + e->dir.x * move_speed)][(int)e->pos.y]
+# define LEVEL_TEST_Y	e->level[(int)e->pos.x][(int)(e->pos.y - e->dir.y * move_speed)]
 
 typedef enum			e_texture_type
 {
@@ -103,6 +106,7 @@ typedef struct			s_sprite
 	int					pick_up;
 	int					value;
 	int					distance;
+	int					light_source;
 	struct s_sprite		*next;
 }						t_sprite;
 
@@ -137,6 +141,9 @@ typedef struct			s_floorcast
 	t_pos				current_floor;
 	int					floor_tex_x;
 	int					floor_tex_y;
+	int					x;
+	int					y;
+	double				shadow;
 }						t_floorcast;
 
 typedef struct			s_spritecast
@@ -176,6 +183,7 @@ typedef struct			s_env
 	double				old_plane_x;
 	t_rgba				color;
 	int					**level;
+	double				**shadows;
 	double				hit_point;
 	SDL_Surface			*wall_greystone;
 	SDL_Surface			*wall_wood;
@@ -207,6 +215,9 @@ typedef struct			s_env
 
 }						t_env;
 
+void					floor_cast(t_env *e, t_raycast *r, int x);
+void					create_rgb(t_rgba *c, int r, int g, int b);
+void					operate_rgba(t_rgba *c, char op, double value);
 Uint32					create_color(int r, int g, int b);
 char					**singleton_map(void);
 void					event(t_env *e);
@@ -221,5 +232,10 @@ void					sprite_cast(t_env *e, t_raycast *r);
 t_sprite				*create_new_sprite(t_env *e, int i, int j, int type);
 void					draw_hud(t_env *e);
 int						get_texture_type(int type);
+void					update_sprite(t_sprite *tmp, t_env *e);
+void					update_sprite_pos(t_env *e);
+t_sprite				*create_new_sprite(t_env *e, int i, int j, int type);
+void					create_shadow_buffer(t_env *e);
+
 
 #endif

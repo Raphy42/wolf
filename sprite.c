@@ -6,119 +6,34 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/18 05:31:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/26 00:33:52 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/26 06:21:08 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "wolf.h"
 
-static void		list_split(t_sprite *src, t_sprite **front_ref, t_sprite **back_ref)
+void			update_sprite(t_sprite *tmp, t_env *e)
 {
-	t_sprite	*fast;
-	t_sprite	*slow;
-
-	if (src == NULL || src->next == NULL)
+	if (tmp->sprite == PARTICULE_BULLET)
 	{
-		*front_ref = src;
-		*back_ref = NULL;
-	}
-	else
-	{
-		slow = src;
-		fast = src->next;
-		while (fast != NULL)
+		if (e->level[(int)(tmp->pos.x + tmp->dir.x)]
+			[(int)(tmp->pos.y + tmp->dir.y)])
 		{
-			fast = fast->next;
-			if (fast != NULL)
+			tmp->value = 5;
+			tmp->dir.x = 0;
+			tmp->dir.y = 0;
+			tmp->sprite = PARTICULE_EXPLOSION;
+			if ((int)tmp->pos.x == (int)e->pos.x &&
+				(int)tmp->pos.y == (int)e->pos.y)
 			{
-				slow = slow->next;
-				fast = fast->next;
+				e->player.health -= 10;
+				e->player.hit = 1;
 			}
 		}
-		*front_ref = src;
-		*back_ref = slow->next;
-		slow->next = NULL;
 	}
 }
 
-static t_sprite		*sort_list(t_sprite *a, t_sprite *b, int (*f)(t_sprite *a, t_sprite *b))
-{
-	t_sprite	*result;
-
-	result = NULL;
-	if (a == NULL)
-		return (b);
-	else if (b == NULL)
-		return (a);
-	if ((*f)(a, b))
-	{
-		result = a;
-		result->next = sort_list(a->next, b, (*f));
-	}
-	else
-	{
-		result = b;
-		result->next = sort_list(a, b->next, (*f));
-	}
-	return (result);
-}
-
-static void		merge_sort(t_sprite **head_ref, int (*f)(t_sprite *a, t_sprite *b))
-{
-	t_sprite	*head;
-	t_sprite	*a;
-	t_sprite	*b;
-
-	head = *head_ref;
-	if ((head == NULL) || (head->next == NULL))
-		return ;
-	list_split(head, &a, &b);
-	merge_sort(&a, (*f));
-	merge_sort(&b, (*f));
-	*head_ref = sort_list(a, b, (*f));
-}
-
-static int		sort_sprite_by_distance(t_sprite *a, t_sprite *b)
-{
-	return ((a->distance >= b->distance));
-}
-
-void			update_sprite_pos(t_env *e)
-{
-	int			i;
-	t_sprite	*tmp;
-
-	i = -1;
-	tmp = e->sprite;
-	while (tmp->next != NULL)
-	{
-		if (tmp->sprite == PARTICULE_BULLET)
-		{
-			if (e->level[(int)(tmp->pos.x + tmp->dir.x)]
-				[(int)(tmp->pos.y + tmp->dir.y)])
-			{
-				tmp->value = 5;
-				tmp->dir.x = 0;
-				tmp->dir.y = 0;
-				tmp->sprite = PARTICULE_EXPLOSION;
-				if ((int)tmp->pos.x == (int)e->pos.x && (int)tmp->pos.y == (int)e->pos.y)
-				{
-					e->player.health -= 50;
-					e->player.hit = 1;
-				}
-			}
-		}
-		tmp->pos.x += tmp->dir.x;
-		tmp->pos.y += tmp->dir.y;
-		tmp->distance = ((e->pos.x - tmp->pos.x) *
-			(e->pos.x - tmp->pos.x) + (e->pos.y - tmp->pos.y) *
-			(e->pos.y - tmp->pos.y));
-		tmp = tmp->next;
-	}
-	merge_sort(&e->sprite, &sort_sprite_by_distance);
-}
-
-int			add_new_sprite(t_sprite **head, t_sprite *new)
+int				add_new_sprite(t_sprite **head, t_sprite *new)
 {
 	t_sprite	*tmp;
 
@@ -147,110 +62,9 @@ t_sprite		*create_new_sprite(t_env *e, int i, int j, int type)
 	new->pos.y = j + (new->sprite != PARTICULE_BULLET ? .5 : 0);
 	new->obstacle = (new->sprite == PROP_BARREL ||
 		new->sprite == PROP_ARMOR || new->sprite == PROP_PILLAR) ? 1 : 0;
+	new->light_source = (new->sprite == PROP_LAMP);
 	new->destroy = 0;
 	new->pick_up = (new->sprite == COLLEC_JEWELBOX);
 	new->value = (new->sprite == COLLEC_JEWELBOX) ? 500 : 0;
 	return (new);
-}
-
-SDL_Surface		*select_sprite(t_sprite *s, t_env *e)
-{
-	if (s->sprite == PROP_LAMP)
-		return (e->prop_lamp);
-	else if (s->sprite == PROP_BARREL)
-		return (e->prop_barrel);
-	else if (s->sprite == PROP_ARMOR)
-		return (e->prop_armor);
-	else if (s->sprite == PROP_SKULLPILE)
-		return (e->prop_skullpile);
-	else if (s->sprite == COLLEC_JEWELBOX)
-	{
-		if (s->pick_up == 0)
-			return (NULL);
-		return (e->collec_jewelbox);
-	}
-	else if (s->sprite == PROP_PILLAR)
-		return (e->prop_pillar);
-	else if (s->sprite == PARTICULE_BULLET)
-		return (e->particule_bullet);
-	else if (s->sprite == PARTICULE_EXPLOSION)
-	{
-		if (s->value == 0)
-			return (NULL);
-		s->value--;
-		return (e->particule_explosion);
-	}
-	else if (s->sprite < PROP_BARREL || s->sprite > PARTICULE_EXPLOSION)
-		return (e->surface_error);
-	return (NULL);
-}
-
-int				get_texture_type(int type)
-{
-	if (type == 'A')
-		return (PROP_ARMOR);
-	else if (type == 'B')
-		return (PROP_BARREL);
-	else if (type == 'J')
-		return (COLLEC_JEWELBOX);
-	else if (type == 'L')
-		return (PROP_LAMP);
-	else if (type == 'P')
-		return (PROP_PILLAR);
-	else if (type == 'S')
-		return (PROP_SKULLPILE);
-	return (SURFACE_ERROR);
-}
-
-void			sprite_cast(t_env *e, t_raycast *r)
-{
-	t_rgba		color;
-	SDL_Surface	*selected_sprite;
-	t_sprite	*s;
-	t_spritecast	c;
-
-	s = e->sprite;
-	update_sprite_pos(e);
-	while (s->next != NULL)
-	{
-		if ((selected_sprite = select_sprite(s, e)) == NULL)
-		{
-			s = s->next;
-			continue ;
-		}
-		c.pos.x = s->pos.x - e->pos.x;
-		c.pos.y = s->pos.y - e->pos.y;
-		c.inv_det = 1.0 / (e->plane.x * e->dir.y - e->dir.x * e->plane.y);
-		c.transform.x = c.inv_det * (e->dir.y * c.pos.x - e->dir.x * c.pos.y);
-		c.transform.y = c.inv_det * (-e->plane.y * c.pos.x + e->plane.x * c.pos.y);
-		c.sprite_screen_x = (int)((r->w / 2) * (1 + c.transform.x / c.transform.y));
-		c.sprite_height = abs((int)(r->h / (c.transform.y)));
-		c.draw_start_y = -c.sprite_height / 2 + r->h / 2;
-		if(c.draw_start_y < 0)
-			c.draw_start_y = 0;
-		c.draw_end_y = c.sprite_height / 2 + r->h / 2;
-		if(c.draw_end_y >= r->h)
-			c.draw_end_y = r->h - 1;
-		c.sprite_width = abs((int)(r->h / (c.transform.y)));
-		c.draw_start_x = -c.sprite_width / 2 + c.sprite_screen_x;
-		if(c.draw_start_x < 0)
-			c.draw_start_x = 0;
-		c.draw_end_x = c.sprite_width / 2 + c.sprite_screen_x;
-		if(c.draw_end_x >= r->w)
-			c.draw_end_x = r->w - 1;
-		for(c.stripe = c.draw_start_x; c.stripe < c.draw_end_x; c.stripe++)
-		{
-			c.tex_x = (int)(256 * (c.stripe - (-c.sprite_width / 2 + c.sprite_screen_x)) * e->prop_barrel->w / c.sprite_width) / 256;
-			if(c.transform.y > 0 && c.stripe > 0 && c.stripe < r->w && c.transform.y < r->z_buffer[c.stripe]) 
-			for(c.y = c.draw_start_y; c.y < c.draw_end_y; c.y++) //for every pixel of the current c.stripe
-			{
-				c.d = (c.y) * 256 - r->h * 128 + c.sprite_height * 128; //256 and 128 factors to avoid doubles
-				c.tex_y = ((c.d * selected_sprite->h) / c.sprite_height) / 256;
-				color = ((t_rgba *)selected_sprite->pixels)[selected_sprite->w * c.tex_y + c.tex_x];
-				if (!(color.r == 255 && color.g == 0 && color.b == 255))
-					e->img_buffer[WIN_X * c.y + c.stripe] = create_color(color.b, color.g, color.r);
-			}
-		}
-		s = s->next;
-	}
 }

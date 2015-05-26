@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 16:26:27 by lejoliwolf3d      #+#    #+#             */
-/*   Updated: 2015/05/22 05:57:13 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/26 05:55:55 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ char				**singleton_map(void)
 void				sighandler(int sig)
 {
 	(void)sig;
+	ft_fprintf(2, "\nKilled Wolf3D\n");
 	exit (EXIT_FAILURE);
 }
 
@@ -35,6 +36,7 @@ int					main(void)
 	ft_bzero(&e, sizeof(t_env));
 	init(&e);
 	create_texture_array(&e);
+	create_shadow_buffer(&e);
 	while (1)
 	{
 		ft_bzero(e.img_buffer, sizeof(Uint32) * WIN_X * WIN_Y);
