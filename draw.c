@@ -6,100 +6,13 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 04:14:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/22 06:12:36 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/26 04:35:41 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "wolf.h"
 #include "libft.h"
 #include <math.h>
-
-Uint32				create_color(int r, int g, int b)
-{
-	return (((r << 8)+ g) << 8)+ b;
-}
-
-void				operate_rgba(t_rgba *c, char op, int value)
-{
-	if (op == '/')
-	{
-		c->r /= value;
-		c->g /= value;
-		c->b /= value;
-	}
-	else if (op == '+')
-	{
-		c->r += value;
-		c->g += value;
-		c->b += value;
-	}
-}
-
-void				create_rgb(t_rgba *c, int r, int g, int b)
-{
-	c->r = r;
-	c->g = g;
-	c->b = b;
-}
-
-static void			init_floor_cast(t_raycast *r, t_floorcast *f)
-{
-	if(r->side == 0 && r->ray_dir.x > 0)
-	{
-		f->floor_wall.x = r->map_x;
-		f->floor_wall.y = r->map_y + r->wall_x;
-	}
-	else if (r->side == 0 && r->ray_dir.x < 0)
-	{
-		f->floor_wall.x = r->map_x + 1.0;
-		f->floor_wall.y = r->map_y + r->wall_x;
-	}
-	else if (r->side == 1 && r->ray_dir.y > 0)
-	{
-		f->floor_wall.x = r->map_x + r->wall_x;
-		f->floor_wall.y = r->map_y;
-	}
-	else
-	{
-		f->floor_wall.x = r->map_x + r->wall_x;
-		f->floor_wall.y = r->map_y + 1.0;
-	} 
-	f->dist_wall = r->perp_wall_dist;
-	f->dist_player = 0.0;
-}
-
-void				floor_cast(t_env *e, t_raycast *r, int x)
-{
-	t_floorcast		f;
-	t_rgba			color;
-	int				checker;
-	SDL_Surface		*selected_surface;
-	int				y;
-
-	init_floor_cast(r, &f);
-	if (r->draw_end < 0)
-		r->draw_end = r->h;
-	y = r->draw_end;
-	while (++y < r->h)
-	{
-		f.current_dist = r->h / (2.0 * y - r->h);
-		f.weight = (f.current_dist - f.dist_player) / (f.dist_wall - f.dist_player);
-		f.current_floor.x = f.weight * f.floor_wall.x + (1.0 - f.weight) * e->pos.x;
-		f.current_floor.y = f.weight * f.floor_wall.y + (1.0 - f.weight) * e->pos.y;
-		f.floor_tex_x = (int)(f.current_floor.x * TEX_WIDTH) % TEX_WIDTH;
-		f.floor_tex_y = (int)(f.current_floor.y * TEX_HEIGHT) % TEX_HEIGHT;
-		selected_surface = e->wall_wood;
-		if (e->player.life == 0)
-			selected_surface = e->game_over;
-		checker = ((int)f.current_floor.x + (int)f.current_floor.y) % 2;
-		if(checker == 0)
-			color = ((t_rgba *)selected_surface->pixels)[TEX_WIDTH * f.floor_tex_y + f.floor_tex_x];
-		else
-			color = ((t_rgba *)selected_surface->pixels)[TEX_WIDTH * f.floor_tex_x + f.floor_tex_y];
-		e->img_buffer[WIN_X * y + x] = create_color(color.b, color.g, color.r);
-		//e->img_buffer[WIN_X * (r->h - y) + x] = create_color(color.b, color.g, color.r);
-	}
-}
 
 static void	init_ray_cast(t_env *e, t_raycast *r, int x)
 {
