@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/26 01:06:49 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/26 02:55:16 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/26 23:53:21 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 SDL_Surface			*select_sprite(t_sprite *s, t_env *e)
 {
-	if (s->sprite == PROP_LAMP)
+	if (s->sprite == PROP_LAMP || s->sprite == PROP_LAMP_FLICKER)
 		return (e->prop_lamp);
 	else if (s->sprite == PROP_BARREL)
 		return (e->prop_barrel);
@@ -29,7 +29,7 @@ SDL_Surface			*select_sprite(t_sprite *s, t_env *e)
 	else if (s->sprite == PARTICULE_BULLET)
 		return (e->particule_bullet);
 	else if (s->sprite == PARTICULE_EXPLOSION)
-		return (--s->value < 0 ? NULL : e->particule_explosion);
+		return (--s->light_source < 0 ? NULL : e->particule_explosion);
 	else if (s->sprite < PROP_BARREL || s->sprite > PARTICULE_EXPLOSION)
 		return (e->surface_error);
 	return (NULL);
@@ -49,6 +49,8 @@ int					get_texture_type(int type)
 		return (PROP_PILLAR);
 	else if (type == 'S')
 		return (PROP_SKULLPILE);
+	else if (type == 'l')
+		return (PROP_LAMP_FLICKER);
 	return (SURFACE_ERROR);
 }
 
@@ -80,6 +82,23 @@ void				init_sprite_cast(t_env *e, t_raycast *r, t_sprite *s,
 		c->draw_end_x = r->w - 1;
 }
 
+static void			alpha_blending(t_env *e, t_rgba *color, int x, int y)
+{
+	Uint32			bg;
+	t_rgba			color_bg;
+
+	if (color->r == 0 && color->b == 255 && color->g == 0)
+	{
+		bg = e->img_buffer[WIN_X * y + x];
+		color_bg.r = (bg << 16) & 0xFF0000;
+		color_bg.g = (bg << 8) & 0xFF0000;
+		color_bg.b = bg & 0xFF0000;
+		color->r = lerp(color_bg.r, 155, 1);
+		color->g = lerp(color_bg.g, 155, 1);
+		color->b = lerp(color_bg.b, 155, 1);
+	}
+}
+
 void				loop_sprite_cast(t_spritecast *c, SDL_Surface *sel,
 	t_raycast *r, t_env *e)
 {
@@ -98,6 +117,10 @@ void				loop_sprite_cast(t_spritecast *c, SDL_Surface *sel,
 				c->d = (c->y) * 256 - r->h * 128 + c->sprite_height * 128;
 				c->tex_y = ((c->d * sel->h) / c->sprite_height) / 256;
 				color = ((t_rgba *)sel->pixels)[sel->w * c->tex_y + c->tex_x];
+				if (sel == e->prop_lamp)
+					alpha_blending(e, &color, c->stripe, c->y);
+				if (!(color.r == 255 && color.g == 0 && color.b == 255))
+					operate_rgba(&color, '/', c->shadow);
 				if (!(color.r == 255 && color.g == 0 && color.b == 255))
 					e->img_buffer[WIN_X * c->y + c->stripe] =
 				create_color(color.b, color.g, color.r);
@@ -121,6 +144,7 @@ void				sprite_cast(t_env *e, t_raycast *r)
 			s = s->next;
 			continue ;
 		}
+		c.shadow = 5 / (e->shadows[(int)s->pos.x][(int)s->pos.y] + 1);
 		init_sprite_cast(e, r, s, &c);
 		c.stripe = c.draw_start_x - 1;
 		loop_sprite_cast(&c, selected_sprite, r, e);

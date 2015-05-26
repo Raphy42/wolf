@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 04:14:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/26 04:35:41 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/26 09:58:15 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,17 +125,13 @@ void		draw(t_env *e)
 			texX = TEX_WIDTH - texX - 1;
 		if(r.side == 1 && r.ray_dir.y < 0)
 			texX = TEX_WIDTH - texX - 1;
+		r.shadow = 5 / (e->shadows[(int)r.map_x][(int)r.map_y] + 1);
 		for(int y = r.draw_start; y < r.draw_end; y++)
 		{
 			int d = y * 256 - r.h * 128 + lineHeight * 128;  //256 and 128 factors to avoid doubles
 			int texY = ((d * TEX_HEIGHT) / lineHeight) / 256;
 			color = ((t_rgba *)selected_surface->pixels)[TEX_WIDTH * texY + texX];
-			if(r.side == 1)
-			{
-				color.r = (color.r >> 1) & 8355711;
-				color.g = (color.g >> 1) & 8355711;
-				color.b = (color.b >> 1) & 8355711;
-			}
+			operate_rgba(&color, '/', r.shadow);
 			e->img_buffer[WIN_X * y + x] = create_color(color.b, color.g, color.r);
 		}
 		floor_cast(e, &r, x);

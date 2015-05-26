@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/20 09:06:55 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/26 04:32:04 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/26 09:17:13 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ static void				print_gun(t_env *e)
 	src.y = e->player.selected_weapon * 64 + e->player.selected_weapon;
 	src.w = 64;
 	src.h = 64;
+	SDL_SetTextureColorMod(e->weapon_all, SHADOW_FPS, SHADOW_FPS, SHADOW_FPS);
 	SDL_RenderCopy(e->render, e->weapon_all, &src, &middle_dest);
 }
 

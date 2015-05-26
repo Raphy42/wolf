@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 16:26:27 by lejoliwolf3d      #+#    #+#             */
-/*   Updated: 2015/05/26 05:55:55 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/26 10:34:04 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ int					main(void)
 		SDL_RenderPresent(e.render);
 		ft_bzero(e.img_buffer, sizeof(Uint32) * WIN_X * WIN_Y);
 		ft_fprintf(2, "\033[1m%ffps\r\033[0m", 1 / e.frame_time);
+		update_all_shadows(&e);
 	}
 	return (0);
 }

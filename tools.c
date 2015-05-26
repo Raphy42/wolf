@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 16:31:55 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/22 06:08:52 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/26 10:59:31 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ const t_texture_descriptor		g_textures[] = {
 	{PROP_SKULLPILE, "skullpile.bmp"},
 	{PROP_ARMOR, "armor.bmp"},
 	{PROP_LAMP, "lamp.bmp"},
+	{PROP_LAMP_FLICKER, NULL},
 	{PROP_PILLAR, "pillar.bmp"},
 	{COLLEC_JEWELBOX, "jewelbox.bmp"},
 	{HUD_MAIN, "hud.bmp"},

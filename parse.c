@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:25:07 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/26 05:44:36 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/26 10:43:28 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,8 +103,6 @@ void				init(t_env *e)
 	e->window = SDL_CreateWindow("wolf3d", SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED, WIN_X, WIN_Y, SDL_WINDOW_SHOWN);
 	e->render = SDL_CreateRenderer(e->window, -1, SDL_RENDERER_ACCELERATED);
-	SDL_SetRenderDrawColor(e->render, 0, 0 ,0, 1);
-	SDL_RenderClear(e->render);
 	e->dir.x = -1;
 	e->dir.y = 0;
 	e->plane.y = 0.66;

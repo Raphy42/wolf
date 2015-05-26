@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:07:27 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/26 05:39:40 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/26 10:35:37 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void			event(t_env *e)
         else if (KEY == SDLK_x && e->player.weapon_state <= 5)
         {
         	e->player.weapon_state = (6 - e->player.selected_weapon) * 5;
-        	add_new_sprite(&e->sprite, create_new_sprite(e, e->pos.x, e->pos.y, PARTICULE_BULLET));
+        	add_new_sprite(&e->sprite, create_new_sprite(e, (int)e->pos.x, (int)e->pos.y, PARTICULE_BULLET));
 		}
 		return ;
     }

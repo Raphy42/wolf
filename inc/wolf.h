@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 14:44:00 by leboheader        #+#    #+#             */
-/*   Updated: 2015/05/26 05:56:55 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/27 00:14:47 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,21 +16,22 @@
 # include "libft.h"
 # include "SDL.h"
 
-# define MAP_PATH		"map1"
-# define MAP			singleton_map();
-# define M				e->map
-# define WIN_X			1200
-# define WIN_Y			800
-# define WIN_RAY_Y		(WIN_Y - 150)
-# define TEX_WIDTH		512
-# define TEX_HEIGHT		512
-# define PORTRAIT		503, 20, 614, 134
-# define KEY			e->event.key.keysym.sym
-# define DEFAULT_POS_X	e->default_pos.x;
-# define DEFAULT_POS_Y	e->default_pos.y;
-# define MIDDLE_DEST	WIN_X / 2 - 256, WIN_RAY_Y - 512, 512, 512
-# define LEVEL_TEST_X	e->level[(int)(e->pos.x + e->dir.x * move_speed)][(int)e->pos.y]
-# define LEVEL_TEST_Y	e->level[(int)e->pos.x][(int)(e->pos.y - e->dir.y * move_speed)]
+# define MAP_PATH			"map1"
+# define MAP				singleton_map();
+# define M					e->map
+# define WIN_X				1200
+# define WIN_Y				800
+# define WIN_RAY_Y			(WIN_Y - 150)
+# define TEX_WIDTH			512
+# define TEX_HEIGHT			512
+# define PORTRAIT			503, 20, 614, 134
+# define KEY				e->event.key.keysym.sym
+# define DEFAULT_POS_X		e->default_pos.x;
+# define DEFAULT_POS_Y		e->default_pos.y;
+# define MIDDLE_DEST		WIN_X / 2 - 256, WIN_RAY_Y - 512, 512, 512
+# define LEVEL_TEST_X		e->level[(int)(e->pos.x + e->dir.x * move_speed)][(int)e->pos.y]
+# define LEVEL_TEST_Y		e->level[(int)e->pos.x][(int)(e->pos.y - e->dir.y * move_speed)]
+# define SHADOW_FPS			255 * e->shadows[(int)e->pos.x][(int)e->pos.y] / 4
 
 typedef enum			e_texture_type
 {
@@ -45,6 +46,7 @@ typedef enum			e_texture_type
 	PROP_SKULLPILE,
 	PROP_ARMOR,
 	PROP_LAMP,
+	PROP_LAMP_FLICKER,
 	PROP_PILLAR,
 	COLLEC_JEWELBOX,
 	HUD_MAIN,
@@ -107,6 +109,7 @@ typedef struct			s_sprite
 	int					value;
 	int					distance;
 	int					light_source;
+	int					light_flicker;
 	struct s_sprite		*next;
 }						t_sprite;
 
@@ -129,6 +132,7 @@ typedef struct			s_raycast
 	int					draw_start;
 	int					draw_end;
 	double				z_buffer[WIN_X];
+	double				shadow;
 }						t_raycast;
 
 typedef struct			s_floorcast
@@ -144,6 +148,7 @@ typedef struct			s_floorcast
 	int					x;
 	int					y;
 	double				shadow;
+	double				shadow_lerp;
 }						t_floorcast;
 
 typedef struct			s_spritecast
@@ -163,6 +168,7 @@ typedef struct			s_spritecast
 	int					tex_y;
 	int					d;
 	int					y;
+	double				shadow;
 }						t_spritecast;
 
 typedef struct			s_env
@@ -236,6 +242,9 @@ void					update_sprite(t_sprite *tmp, t_env *e);
 void					update_sprite_pos(t_env *e);
 t_sprite				*create_new_sprite(t_env *e, int i, int j, int type);
 void					create_shadow_buffer(t_env *e);
+float					lerp(float v0, float v1, float t);
+void					update_bullet_shadow_buffer(t_env *e);
+void					update_all_shadows(t_env *e);
 
 
 #endif
