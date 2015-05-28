@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 14:44:00 by leboheader        #+#    #+#             */
-/*   Updated: 2015/05/27 00:14:47 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/28 13:26:39 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,18 @@ typedef enum			e_texture_type
 	GAME_OVER
 }						t_texture_type;
 
+typedef struct			s_texture_descriptor
+{
+	t_texture_type		type;
+	char				*name;
+}						t_texture_descriptor;
+
+typedef struct			s_texture_array
+{
+	t_texture_type		type;
+	SDL_Surface			*surface;
+}						t_texture_array;
+
 typedef struct			s_player
 {
 	int					score;
@@ -86,12 +98,6 @@ typedef struct			s_rgba
 	uint8_t				b;
 }						t_rgba;
 
-typedef struct			s_texture_descriptor
-{
-	t_texture_type		type;
-	char				*name;
-}						t_texture_descriptor;
-
 typedef struct			s_pos
 {
 	double				x;
@@ -115,6 +121,7 @@ typedef struct			s_sprite
 
 typedef struct			s_raycast
 {
+	int					d;
 	int					w;
 	int					h;
 	double				camera_x;
@@ -128,6 +135,9 @@ typedef struct			s_raycast
 	int					step_x;
 	int					step_y;
 	double				wall_x;
+	int					line_height;
+	int					tex_x;
+	int					tex_y;
 	int					side;
 	int					draw_start;
 	int					draw_end;

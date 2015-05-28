@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/26 01:06:49 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/26 23:53:21 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/28 11:18:50 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ SDL_Surface			*select_sprite(t_sprite *s, t_env *e)
 	else if (s->sprite == PARTICULE_BULLET)
 		return (e->particule_bullet);
 	else if (s->sprite == PARTICULE_EXPLOSION)
-		return (--s->light_source < 0 ? NULL : e->particule_explosion);
+		return (s->light_source == 0 ? NULL : e->particule_explosion);
 	else if (s->sprite < PROP_BARREL || s->sprite > PARTICULE_EXPLOSION)
 		return (e->surface_error);
 	return (NULL);
@@ -90,12 +90,12 @@ static void			alpha_blending(t_env *e, t_rgba *color, int x, int y)
 	if (color->r == 0 && color->b == 255 && color->g == 0)
 	{
 		bg = e->img_buffer[WIN_X * y + x];
-		color_bg.r = (bg << 16) & 0xFF0000;
-		color_bg.g = (bg << 8) & 0xFF0000;
-		color_bg.b = bg & 0xFF0000;
-		color->r = lerp(color_bg.r, 155, 1);
-		color->g = lerp(color_bg.g, 155, 1);
-		color->b = lerp(color_bg.b, 155, 1);
+		color_bg.b = (bg >> 16) & 0xFF;
+		color_bg.g = (bg >> 8) & 0xFF;
+		color_bg.r = bg & 0xFF;
+		color->r = (110 * .5) + (color_bg.r * (1.0 - .5));
+		color->g = (110 * .5) + (color_bg.g * (1.0 - .5));
+		color->b = (110 * .5) + (color_bg.b * (1.0 - .5));
 	}
 }
 
