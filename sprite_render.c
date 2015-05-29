@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/26 01:06:49 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/28 11:18:50 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/28 17:58:04 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,9 +93,9 @@ static void			alpha_blending(t_env *e, t_rgba *color, int x, int y)
 		color_bg.b = (bg >> 16) & 0xFF;
 		color_bg.g = (bg >> 8) & 0xFF;
 		color_bg.r = bg & 0xFF;
-		color->r = (110 * .5) + (color_bg.r * (1.0 - .5));
-		color->g = (110 * .5) + (color_bg.g * (1.0 - .5));
-		color->b = (110 * .5) + (color_bg.b * (1.0 - .5));
+		color->r = (255 * .5) + (color_bg.r * (1.0 - .5));
+		color->g = (255 * .5) + (color_bg.g * (1.0 - .5));
+		color->b = (255 * .5) + (color_bg.b * (1.0 - .5));
 	}
 }
 
