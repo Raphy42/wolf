@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 16:26:27 by lejoliwolf3d      #+#    #+#             */
-/*   Updated: 2015/05/30 10:57:01 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/06/01 17:28:08 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,19 +28,18 @@ void				sighandler(int sig)
 	exit (EXIT_FAILURE);
 }
 
-void				loop_start(t_env *e)
+static void			loop_start(t_env *e)
 {
-	ft_bzero(e->img_buffer, sizeof(Uint32) * WIN_X * WIN_Y);
+	ft_bzero(e->img_buffer, DEFINE_ALAKON);
 	e->time_start = e->time_end;
 	e->time_end = SDL_GetTicks();
 	e->frame_time = (e->time_end - e->time_start) / 1000.0;
 }
 
-void				loop_end(t_env *e)
+static void			loop_end(t_env *e)
 {
 	draw(e);
-	SDL_UpdateTexture(e->img, NULL, e->img_buffer, WIN_X *
-		sizeof(Uint32));
+	SDL_UpdateTexture(e->img, NULL, e->img_buffer, DEFINE_ALAKON2);
 	if (e->player.hit)
 		SDL_SetTextureColorMod(e->img, 255 -
 			(100 - e->player.health), 0, 0);

@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/26 05:44:42 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/29 10:10:11 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/06/01 17:10:05 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void				update_all_shadows(t_env *e)
 
 	tmp = e->sprite;
 	i = -1;
-		force = 3 - cos(rand() / 2);
+	force = 3 - cos(SDL_GetTicks());
 	while (++i < e->map_h)
 		ft_bzero(e->shadows[i], sizeof(double) * e->map_w);
 	while (tmp->next != NULL)

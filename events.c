@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:07:27 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/30 11:00:58 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/06/01 17:03:25 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ static void		event_key_down(t_env *e)
 		else if (KEY == SDLK_LEFT)
 			e->key.left = 1;
 		else if (KEY == SDLK_RIGHT)
-			e->key.right= 1;
+			e->key.right = 1;
 		else if (KEY == SDLK_UP)
 			e->key.up = 1;
 		else if (KEY == SDLK_DOWN)
@@ -77,7 +77,7 @@ void			event(t_env *e)
 		if (KEY == SDLK_LEFT)
 			e->key.left = 0;
 		else if (KEY == SDLK_RIGHT)
-			e->key.right= 0;
+			e->key.right = 0;
 		else if (KEY == SDLK_UP)
 			e->key.up = 0;
 		else if (KEY == SDLK_DOWN)

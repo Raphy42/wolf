@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:25:07 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/30 19:39:57 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/06/01 16:53:40 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ static void			convert_map(t_env *e)
 			{
 				e->default_pos.x = i;
 				e->default_pos.y = j;
+				e->level[i][j] = 0;
 			}
 			if (ft_isalpha(map[i][j]))
 				e->level[i][j] = add_new_sprite(&e->sprite,

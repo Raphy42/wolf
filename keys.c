@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/29 09:31:40 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/29 09:57:22 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/06/01 17:06:33 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@ static void				move_keys(t_env *e)
 
 	if (e->key.up)
 	{
-
 		if (L[(int)(e->pos.x + e->dir.x * move_speed)][(int)e->pos.y] == 0)
 			e->pos.x += e->dir.x * move_speed;
 		if (L[(int)e->pos.x][(int)(e->pos.y + e->dir.y * move_speed)] == 0)

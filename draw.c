@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 04:14:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/29 09:51:55 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/06/01 17:02:47 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "libft.h"
 #include <math.h>
 
-static int	check_collision(t_env *e, t_raycast *r)
+static int				check_collision(t_env *e, t_raycast *r)
 {
 	if (e->level[r->map_x][r->map_y] > 0)
 		return (1);
@@ -22,7 +22,7 @@ static int	check_collision(t_env *e, t_raycast *r)
 		return (0);
 }
 
-static SDL_Surface	*select_wall_type(int wall_type, t_env *e)
+static SDL_Surface		*select_wall_type(int wall_type, t_env *e)
 {
 	if (e->player.life == 0)
 		return (e->game_over);
@@ -42,9 +42,9 @@ static SDL_Surface	*select_wall_type(int wall_type, t_env *e)
 		return (NULL);
 }
 
-static void		ray_cast_collision(t_env *e, t_raycast *r)
+static void				ray_cast_collision(t_env *e, t_raycast *r)
 {
-	int			hit;
+	int					hit;
 
 	hit = 0;
 	while (hit == 0)
@@ -65,10 +65,11 @@ static void		ray_cast_collision(t_env *e, t_raycast *r)
 	}
 }
 
-static void		ray_cast_draw(int x, t_raycast *r, t_env *e, SDL_Surface *sel)
+static void				ray_cast_draw(int x, t_raycast *r, t_env *e,
+	SDL_Surface *sel)
 {
-	int			y;
-	t_rgba		color;
+	int					y;
+	t_rgba				color;
 
 	y = r->draw_start - 1;
 	while (++y < r->draw_end)
@@ -81,11 +82,11 @@ static void		ray_cast_draw(int x, t_raycast *r, t_env *e, SDL_Surface *sel)
 	}
 }
 
-void			draw(t_env *e)
+void					draw(t_env *e)
 {
-	int			x;
-	t_raycast	r;
-	SDL_Surface *selected_surface;
+	int					x;
+	t_raycast			r;
+	SDL_Surface			*selected_surface;
 
 	x = -1;
 	r.h = WIN_RAY_Y;

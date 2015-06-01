@@ -6,12 +6,12 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 14:44:00 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/30 10:26:56 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/06/01 17:29:20 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FRACTOL_H
-# define FRACTOL_H
+#ifndef WOLF_H
+# define WOLF_H
 
 # include "libft.h"
 # include "SDL.h"
@@ -32,6 +32,9 @@
 # define WIN_RAY_Y			(WIN_Y - 150)
 # define WIN_X				1200
 # define WIN_Y				800
+# define COLOR				create_color(color.b, color.g, color.r)
+# define DEFINE_ALAKON		sizeof(Uint32) * WIN_X * WIN_Y
+# define DEFINE_ALAKON2		WIN_X * sizeof(Uint32)
 
 typedef enum			e_texture_type
 {
@@ -235,7 +238,8 @@ float					lerp(float v0, float v1, float t);
 int						add_new_sprite(t_sprite **head, t_sprite *new);
 int						get_texture_type(int type);
 SDL_Surface				*load_texture(t_texture_type name);
-t_sprite				*create_new_sprite(t_env *e, double i, double j, int type);
+t_sprite				*create_new_sprite(t_env *e, double i, double j,
+	int type);
 Uint32					create_color(int r, int g, int b);
 void					alpha_blending(t_env *e, t_rgba *color, int x, int y);
 void					check_prop_collide(t_env *e);
@@ -256,6 +260,5 @@ void					update_all_shadows(t_env *e);
 void					update_bullet_shadow_buffer(t_env *e);
 void					update_sprite(t_sprite *tmp, t_env *e);
 void					update_sprite_pos(t_env *e);
-
 
 #endif
