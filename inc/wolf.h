@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/04/25 14:44:00 by leboheader        #+#    #+#             */
-/*   Updated: 2015/05/28 13:26:39 by rdantzer         ###   ########.fr       */
+/*   Created: 2015/04/25 14:44:00 by rdantzer          #+#    #+#             */
+/*   Updated: 2015/05/30 10:26:56 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,22 +16,22 @@
 # include "libft.h"
 # include "SDL.h"
 
-# define MAP_PATH			"map1"
-# define MAP				singleton_map();
-# define M					e->map
-# define WIN_X				1200
-# define WIN_Y				800
-# define WIN_RAY_Y			(WIN_Y - 150)
-# define TEX_WIDTH			512
-# define TEX_HEIGHT			512
-# define PORTRAIT			503, 20, 614, 134
-# define KEY				e->event.key.keysym.sym
 # define DEFAULT_POS_X		e->default_pos.x;
 # define DEFAULT_POS_Y		e->default_pos.y;
+# define KEY				e->event.key.keysym.sym
+# define L					e->level
+# define M					e->map
+# define MAP				singleton_map();
+# define MAP_PATH			"map1"
 # define MIDDLE_DEST		WIN_X / 2 - 256, WIN_RAY_Y - 512, 512, 512
-# define LEVEL_TEST_X		e->level[(int)(e->pos.x + e->dir.x * move_speed)][(int)e->pos.y]
-# define LEVEL_TEST_Y		e->level[(int)e->pos.x][(int)(e->pos.y - e->dir.y * move_speed)]
-# define SHADOW_FPS			255 * e->shadows[(int)e->pos.x][(int)e->pos.y] / 4
+# define PORTRAIT			503, 20, 614, 134
+# define ROT				rotation_speed
+# define SHADOW_FPS			255 * e->shadows[(int)e->pos.x][(int)e->pos.y] / 3
+# define TEX_HEIGHT			512
+# define TEX_WIDTH			512
+# define WIN_RAY_Y			(WIN_Y - 150)
+# define WIN_X				1200
+# define WIN_Y				800
 
 typedef enum			e_texture_type
 {
@@ -183,78 +183,79 @@ typedef struct			s_spritecast
 
 typedef struct			s_env
 {
-	SDL_Window			*window;
-	SDL_Event			event;
-	SDL_Renderer		*render;
-	double				time_start;
-	double				time_end;
+	double				**shadows;
 	double				frame_time;
-	t_pos				default_pos;
-	t_pos				pos;
-	t_pos				dir;
-	t_pos				plane;
-	int					map_w;
-	int					map_h;
+	double				hit_point;
 	double				old_dir_x;
 	double				old_plane_x;
-	t_rgba				color;
+	double				time_end;
+	double				time_start;
 	int					**level;
-	double				**shadows;
-	double				hit_point;
+	int					map_h;
+	int					map_w;
+	SDL_Event			event;
+	SDL_Renderer		*render;
+	SDL_Surface			*collec_jewelbox;
+	SDL_Surface			*game_over;
+	SDL_Surface			*particule_bullet;
+	SDL_Surface			*particule_explosion;
+	SDL_Surface			*prop_armor;
+	SDL_Surface			*prop_barrel;
+	SDL_Surface			*prop_lamp;
+	SDL_Surface			*prop_pillar;
+	SDL_Surface			*prop_skullpile;
+	SDL_Surface			*surface_error;
+	SDL_Surface			*wall_bluestone;
+	SDL_Surface			*wall_bluestone_jail;
+	SDL_Surface			*wall_colorstone;
 	SDL_Surface			*wall_greystone;
 	SDL_Surface			*wall_wood;
 	SDL_Surface			*wall_wood_paint;
-	SDL_Surface			*wall_colorstone;
-	SDL_Surface			*wall_bluestone;
-	SDL_Surface			*wall_bluestone_jail;
-	SDL_Surface			*prop_barrel;
-	SDL_Surface			*prop_skullpile;
-	SDL_Surface			*prop_armor;
-	SDL_Surface			*prop_lamp;
-	SDL_Surface			*prop_pillar;
-	SDL_Surface			*collec_jewelbox;
-	SDL_Surface			*particule_bullet;
-	SDL_Surface			*particule_explosion;
-	SDL_Surface			*surface_error;
-	SDL_Surface			*game_over;
-	SDL_Texture			*red_damage;
-	SDL_Texture			*hud_bj_face;
-	SDL_Texture			*hud_number;
-	SDL_Texture			*hud_gun;
-	SDL_Texture			*weapon_all;
 	SDL_Texture			*hud;
+	SDL_Texture			*hud_bj_face;
+	SDL_Texture			*hud_gun;
+	SDL_Texture			*hud_number;
 	SDL_Texture			*img;
-	Uint32				*img_buffer;
+	SDL_Texture			*red_damage;
+	SDL_Texture			*weapon_all;
+	SDL_Window			*window;
 	t_key				key;
-	t_sprite			*sprite;
 	t_player			player;
-
+	t_pos				default_pos;
+	t_pos				dir;
+	t_pos				plane;
+	t_pos				pos;
+	t_rgba				color;
+	t_sprite			*sprite;
+	Uint32				*img_buffer;
 }						t_env;
 
-void					floor_cast(t_env *e, t_raycast *r, int x);
-void					create_rgb(t_rgba *c, int r, int g, int b);
-void					operate_rgba(t_rgba *c, char op, double value);
-Uint32					create_color(int r, int g, int b);
 char					**singleton_map(void);
-void					event(t_env *e);
-void					run_event(t_env *e);
-void					init(t_env *e);
-void					draw(t_env *e);
-SDL_Surface				*load_texture(t_texture_type name);
-void					create_texture_array(t_env *e);
-void					check_prop_collide(t_env *e);
+float					lerp(float v0, float v1, float t);
 int						add_new_sprite(t_sprite **head, t_sprite *new);
-void					sprite_cast(t_env *e, t_raycast *r);
-t_sprite				*create_new_sprite(t_env *e, int i, int j, int type);
-void					draw_hud(t_env *e);
 int						get_texture_type(int type);
+SDL_Surface				*load_texture(t_texture_type name);
+t_sprite				*create_new_sprite(t_env *e, double i, double j, int type);
+Uint32					create_color(int r, int g, int b);
+void					alpha_blending(t_env *e, t_rgba *color, int x, int y);
+void					check_prop_collide(t_env *e);
+void					create_rgb(t_rgba *c, int r, int g, int b);
+void					create_shadow_buffer(t_env *e);
+void					create_texture_array(t_env *e);
+void					draw(t_env *e);
+void					draw_hud(t_env *e);
+void					event(t_env *e);
+void					floor_cast(t_env *e, t_raycast *r, int x);
+void					init(t_env *e);
+void					init_ray_cast(t_env *e, t_raycast *r, int x);
+void					operate_rgba(t_rgba *c, char op, double value);
+void					ray_cast(t_env *e, t_raycast *r);
+void					run_event(t_env *e);
+void					sprite_cast(t_env *e, t_raycast *r);
+void					update_all_shadows(t_env *e);
+void					update_bullet_shadow_buffer(t_env *e);
 void					update_sprite(t_sprite *tmp, t_env *e);
 void					update_sprite_pos(t_env *e);
-t_sprite				*create_new_sprite(t_env *e, int i, int j, int type);
-void					create_shadow_buffer(t_env *e);
-float					lerp(float v0, float v1, float t);
-void					update_bullet_shadow_buffer(t_env *e);
-void					update_all_shadows(t_env *e);
 
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:25:07 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/28 15:10:54 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/30 19:39:57 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,13 +68,12 @@ static void			convert_map(t_env *e)
 			e->level[i][j] = map[i][j] - '0';
 			if (e->level[i][j] == 9)
 			{
-				e->level[i][j] = 0;
 				e->default_pos.x = i;
 				e->default_pos.y = j;
 			}
 			if (ft_isalpha(map[i][j]))
-				e->level[i][j] = add_new_sprite(&e->sprite, create_new_sprite(e, i, j,
-					get_texture_type(map[i][j])));
+				e->level[i][j] = add_new_sprite(&e->sprite,
+					create_new_sprite(e, i, j, get_texture_type(map[i][j])));
 		}
 	}
 }

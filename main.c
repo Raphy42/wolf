@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 16:26:27 by lejoliwolf3d      #+#    #+#             */
-/*   Updated: 2015/05/26 10:34:04 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/30 10:57:01 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,31 @@ void				sighandler(int sig)
 	exit (EXIT_FAILURE);
 }
 
+void				loop_start(t_env *e)
+{
+	ft_bzero(e->img_buffer, sizeof(Uint32) * WIN_X * WIN_Y);
+	e->time_start = e->time_end;
+	e->time_end = SDL_GetTicks();
+	e->frame_time = (e->time_end - e->time_start) / 1000.0;
+}
+
+void				loop_end(t_env *e)
+{
+	draw(e);
+	SDL_UpdateTexture(e->img, NULL, e->img_buffer, WIN_X *
+		sizeof(Uint32));
+	if (e->player.hit)
+		SDL_SetTextureColorMod(e->img, 255 -
+			(100 - e->player.health), 0, 0);
+	else
+		SDL_SetTextureColorMod(e->img, 255, 255, 255);
+	SDL_RenderCopy(e->render, e->img, NULL, NULL);
+	draw_hud(e);
+	SDL_RenderPresent(e->render);
+	ft_fprintf(2, "\033[32;1m%ffps\r\033[0m", 1 / e->frame_time);
+	update_all_shadows(e);
+}
+
 int					main(void)
 {
 	t_env			e;
@@ -39,27 +64,11 @@ int					main(void)
 	create_shadow_buffer(&e);
 	while (1)
 	{
-		ft_bzero(e.img_buffer, sizeof(Uint32) * WIN_X * WIN_Y);
-		e.time_start = e.time_end;
-		e.time_end = SDL_GetTicks();
-		e.frame_time = (e.time_end - e.time_start) / 1000.0;
-		SDL_SetRenderDrawColor(e.render, 150, 150 , 150, 0);
-		SDL_RenderClear(e.render);
-		while(SDL_PollEvent(&e.event))
+		loop_start(&e);
+		while (SDL_PollEvent(&e.event))
 			event(&e);
 		run_event(&e);
-		draw(&e);
-		SDL_UpdateTexture(e.img, NULL, e.img_buffer, WIN_X * sizeof(Uint32));
-		if (e.player.hit)
-			SDL_SetTextureColorMod(e.img, 255 - (100 - e.player.health), 0, 0);
-		else
-			SDL_SetTextureColorMod(e.img, 255, 255, 255);
-		SDL_RenderCopy(e.render, e.img, NULL, NULL);
-		draw_hud(&e);
-		SDL_RenderPresent(e.render);
-		ft_bzero(e.img_buffer, sizeof(Uint32) * WIN_X * WIN_Y);
-		ft_fprintf(2, "\033[1m%ffps\r\033[0m", 1 / e.frame_time);
-		update_all_shadows(&e);
+		loop_end(&e);
 	}
 	return (0);
 }

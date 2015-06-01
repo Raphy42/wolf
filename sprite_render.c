@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/26 01:06:49 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/28 17:58:04 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/29 09:56:10 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,23 +80,6 @@ void				init_sprite_cast(t_env *e, t_raycast *r, t_sprite *s,
 	c->draw_end_x = c->sprite_width / 2 + c->sprite_screen_x;
 	if (c->draw_end_x >= r->w)
 		c->draw_end_x = r->w - 1;
-}
-
-static void			alpha_blending(t_env *e, t_rgba *color, int x, int y)
-{
-	Uint32			bg;
-	t_rgba			color_bg;
-
-	if (color->r == 0 && color->b == 255 && color->g == 0)
-	{
-		bg = e->img_buffer[WIN_X * y + x];
-		color_bg.b = (bg >> 16) & 0xFF;
-		color_bg.g = (bg >> 8) & 0xFF;
-		color_bg.r = bg & 0xFF;
-		color->r = (255 * .5) + (color_bg.r * (1.0 - .5));
-		color->g = (255 * .5) + (color_bg.g * (1.0 - .5));
-		color->b = (255 * .5) + (color_bg.b * (1.0 - .5));
-	}
 }
 
 void				loop_sprite_cast(t_spritecast *c, SDL_Surface *sel,

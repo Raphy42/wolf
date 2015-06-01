@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/26 05:44:42 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/28 13:51:46 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/29 10:10:11 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,18 +30,11 @@ void				update_all_shadows(t_env *e)
 {
 	t_sprite		*tmp;
 	int				i;
-	static short	frame;
-	static double	force;
+	double			force;
 
 	tmp = e->sprite;
 	i = -1;
-	if (frame == 12)
-	{
-		frame = 0;
-		force = 3 - 2 * cos(rand());
-	}
-	else
-		frame++;
+		force = 3 - cos(rand() / 2);
 	while (++i < e->map_h)
 		ft_bzero(e->shadows[i], sizeof(double) * e->map_w);
 	while (tmp->next != NULL)

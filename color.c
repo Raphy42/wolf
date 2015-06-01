@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/26 04:33:37 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/26 08:33:41 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/29 09:56:29 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,4 +43,21 @@ void				create_rgb(t_rgba *c, int r, int g, int b)
 	c->r = r;
 	c->g = g;
 	c->b = b;
+}
+
+void				alpha_blending(t_env *e, t_rgba *color, int x, int y)
+{
+	Uint32			bg;
+	t_rgba			color_bg;
+
+	if (color->r == 0 && color->b == 255 && color->g == 0)
+	{
+		bg = e->img_buffer[WIN_X * y + x];
+		color_bg.b = (bg >> 16) & 0xFF;
+		color_bg.g = (bg >> 8) & 0xFF;
+		color_bg.r = bg & 0xFF;
+		color->r = (255 * .5) + (color_bg.r * (1.0 - .5));
+		color->g = (255 * .5) + (color_bg.g * (1.0 - .5));
+		color->b = (255 * .5) + (color_bg.b * (1.0 - .5));
+	}
 }

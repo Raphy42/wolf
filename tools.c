@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 16:31:55 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/26 10:59:31 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/29 10:14:35 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ const t_texture_descriptor		g_textures[] = {
 	{GAME_OVER, "game_over.bmp"}
 };
 
-SDL_Surface			*load_texture(t_texture_type name)
+SDL_Surface			*load_surface(t_texture_type name)
 {
 	char			*path;
 	SDL_Surface		*surface;
@@ -53,34 +53,48 @@ SDL_Surface			*load_texture(t_texture_type name)
 	return (surface);
 }
 
-void				create_texture_array(t_env *e)
+static SDL_Texture	*load_texture_from_surface(t_env *e, t_texture_type type, int alpha)
 {
 	SDL_Surface		*tmp;
+	SDL_Texture		*texture;
+	Uint32			color_key;
 
-	e->wall_greystone = load_texture(WALL_GREYSTONE);
-	e->wall_colorstone = load_texture(WALL_COLORSTONE);
-	e->wall_wood = load_texture(WALL_WOOD);
-	e->wall_bluestone = load_texture(WALL_BLUESTONE);
-	e->prop_barrel = load_texture(PROP_BARREL);
-	e->prop_skullpile = load_texture(PROP_SKULLPILE);
-	e->prop_armor = load_texture(PROP_ARMOR);
-	e->prop_lamp = load_texture(PROP_LAMP);
-	e->wall_bluestone_jail = load_texture(WALL_BLUESTONE_JAIL);
-	e->collec_jewelbox = load_texture(COLLEC_JEWELBOX);
-	e->wall_wood_paint = load_texture(WALL_WOOD_PAINT);
-	e->hud = SDL_CreateTextureFromSurface(e->render, load_texture(HUD_MAIN));
-	e->hud_bj_face = SDL_CreateTextureFromSurface(e->render, load_texture(HUD_BJ_FACE));
-	e->prop_pillar = load_texture(PROP_PILLAR);
-	e->hud_number = SDL_CreateTextureFromSurface(e->render, load_texture(HUD_NUMBER));
-	e->hud_gun = SDL_CreateTextureFromSurface(e->render, load_texture(HUD_GUN));
-	tmp = load_texture(WEAPON_ALL);
-	Uint32 colorkey = SDL_MapRGB(tmp->format, 255, 0, 255);
-	SDL_SetColorKey(tmp, SDL_TRUE,colorkey);
-	e->weapon_all = SDL_CreateTextureFromSurface(e->render, tmp);
-	e->particule_bullet = load_texture(PARTICULE_BULLET);
-	e->particule_explosion = load_texture(PARTICULE_EXPLOSION);
-	e->surface_error = load_texture(SURFACE_ERROR);
-	e->game_over = load_texture(GAME_OVER);
+	tmp = load_surface(type);
+	if (alpha)
+	{
+		color_key = SDL_MapRGB(tmp->format, 255, 0, 255);
+		SDL_SetColorKey(tmp, SDL_TRUE, color_key);
+	}
+	if (tmp == NULL)
+		exit (ft_fprintf(2, "Texture error\n"));
+	texture = SDL_CreateTextureFromSurface(e->render, tmp);
+	SDL_FreeSurface(tmp);
+	return (texture);
+}
+
+void				create_texture_array(t_env *e)
+{
+	e->wall_greystone = load_surface(WALL_GREYSTONE);
+	e->wall_colorstone = load_surface(WALL_COLORSTONE);
+	e->wall_wood = load_surface(WALL_WOOD);
+	e->wall_bluestone = load_surface(WALL_BLUESTONE);
+	e->prop_barrel = load_surface(PROP_BARREL);
+	e->prop_skullpile = load_surface(PROP_SKULLPILE);
+	e->prop_armor = load_surface(PROP_ARMOR);
+	e->prop_lamp = load_surface(PROP_LAMP);
+	e->wall_bluestone_jail = load_surface(WALL_BLUESTONE_JAIL);
+	e->collec_jewelbox = load_surface(COLLEC_JEWELBOX);
+	e->wall_wood_paint = load_surface(WALL_WOOD_PAINT);
+	e->particule_bullet = load_surface(PARTICULE_BULLET);
+	e->particule_explosion = load_surface(PARTICULE_EXPLOSION);
+	e->surface_error = load_surface(SURFACE_ERROR);
+	e->prop_pillar = load_surface(PROP_PILLAR);
+	e->game_over = load_surface(GAME_OVER);
+	e->hud = load_texture_from_surface(e, HUD_MAIN, 0);
+	e->hud_bj_face = load_texture_from_surface(e, HUD_BJ_FACE, 0);
+	e->hud_number = load_texture_from_surface(e, HUD_NUMBER, 0);
+	e->hud_gun = load_texture_from_surface(e, HUD_GUN, 0);
+	e->weapon_all = load_texture_from_surface(e, WEAPON_ALL, 1);
 }
 
 void				check_prop_collide(t_env *e)

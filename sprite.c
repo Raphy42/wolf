@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/18 05:31:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/28 10:59:02 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/30 10:35:51 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void			update_sprite(t_sprite *tmp, t_env *e)
 			if ((int)tmp->pos.x == (int)e->pos.x &&
 				(int)tmp->pos.y == (int)e->pos.y)
 			{
-				e->player.health -= 50;
+				e->player.health -= 25;
 				e->player.hit = 1;
 			}
 		}
@@ -77,14 +77,14 @@ int				add_new_sprite(t_sprite **head, t_sprite *new)
 	return (-new->obstacle);
 }
 
-t_sprite		*create_new_sprite(t_env *e, int i, int j, int type)
+t_sprite		*create_new_sprite(t_env *e, double i, double j, int type)
 {
 	t_sprite	*new;
 
 	new = (t_sprite *)ft_memalloc(sizeof(t_sprite));
 	new->sprite = type;
 	if (new->sprite == PARTICULE_BULLET)
-		new->dir = e->dir;
+		ft_memcpy(&new->dir, &e->dir, sizeof(t_pos));
 	new->pos.x = i + (new->sprite != PARTICULE_BULLET ? .5 : 0);
 	new->pos.y = j + (new->sprite != PARTICULE_BULLET ? .5 : 0);
 	new->obstacle = (new->sprite == PROP_BARREL ||

@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/26 01:08:14 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/26 05:52:19 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/30 19:42:33 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,8 @@ void			update_sprite_pos(t_env *e)
 	while (tmp->next != NULL)
 	{
 		update_sprite(tmp, e);
+		if (tmp->sprite == PARTICULE_BULLET)
+			tmp->dir = e->dir;
 		tmp->pos.x += tmp->dir.x;
 		tmp->pos.y += tmp->dir.y;
 		tmp->distance = ((e->pos.x - tmp->pos.x) *

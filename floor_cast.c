@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/26 04:35:24 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/05/26 22:05:56 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/05/29 10:12:53 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,11 +53,8 @@ static SDL_Surface	*get_ceiling_color(t_floorcast *f, t_env *e)
 	if (f->current_floor.x > 22 && f->current_floor.x < 32 &&
 		f->current_floor.y > 1 && f->current_floor.y < 13)
 		return (e->wall_bluestone);
-	else if (f->current_floor.x > 1 && f->current_floor.x < 22 &&
-		f->current_floor.y > 13 && f->current_floor.y < 20)
-		return (e->wall_wood);
 	else
-		return (NULL);
+		return (e->wall_wood);
 }
 
 static void			color_floor_cast(t_floorcast *f, t_env *e, t_raycast *r)
