@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 16:31:55 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/06/01 17:11:11 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/06/01 18:16:14 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,8 @@ SDL_Surface			*load_surface(t_texture_type name)
 	free(path);
 	ft_fprintf(2, "Loading surface: %s %s\n",
 		g_textures[name].name, SDL_GetError());
+	if (!surface)
+		exit (EXIT_FAILURE);
 	ft_fprintf(2, "Surface information: %dw %dh\n\n",
 		surface->w, surface->h);
 	return (surface);

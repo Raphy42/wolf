@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 14:44:00 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/06/01 17:29:20 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/06/01 18:05:16 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # define L					e->level
 # define M					e->map
 # define MAP				singleton_map();
-# define MAP_PATH			"map1"
+# define MAP_PATH			".map1"
 # define MIDDLE_DEST		WIN_X / 2 - 256, WIN_RAY_Y - 512, 512, 512
 # define PORTRAIT			503, 20, 614, 134
 # define ROT				rotation_speed
