@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 04:14:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/06/01 17:02:47 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/06/03 14:36:01 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static int				check_collision(t_env *e, t_raycast *r)
 		return (0);
 }
 
-static SDL_Surface		*select_wall_type(int wall_type, t_env *e)
+SDL_Surface				*select_wall_type(int wall_type, t_env *e)
 {
 	if (e->player.life == 0)
 		return (e->game_over);

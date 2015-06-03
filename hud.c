@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/20 09:06:55 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/06/01 17:36:41 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/06/03 15:38:14 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,11 @@ static void				update_bj_face(t_env *e)
 	selected_face.y = offset * 33;
 	selected_face.w = 23;
 	selected_face.h = 30;
+	SDL_RenderCopy(e->render, e->hud_bj_face, &selected_face, &face);
+	face.y = (e->pos.x - 1) * (MINIMAP_W / e->map_w);
+	face.x = (e->pos.y - 1) * (MINIMAP_H / e->map_h);
+	face.w = 4 * MINIMAP_W / e->map_w;
+	face.h = 4 * MINIMAP_H / e->map_h;
 	SDL_RenderCopy(e->render, e->hud_bj_face, &selected_face, &face);
 }
 

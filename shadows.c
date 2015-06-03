@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/26 05:44:42 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/06/01 17:10:05 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/06/03 17:14:58 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@ void				update_shadow_buffer(t_env *e, double force, int x, int y)
 	int				shadow;
 
 	shadow = e->shadows[x][y];
-	if ((int)force <= 0 || x > e->map_w - 1 || y > e->map_h - 1)
+	if ((int)force <= 0 || x > e->map_w - 1 || y > e->map_h - 1 || x == 0 ||
+		y == 0)
 		return ;
 	e->shadows[x][y] = shadow > force ? shadow : force;
 	update_shadow_buffer(e, force - 1, x + 1, y);

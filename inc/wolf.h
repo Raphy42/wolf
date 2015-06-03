@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/04/25 14:44:00 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/06/01 18:05:16 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/06/03 17:02:12 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 # define PORTRAIT			503, 20, 614, 134
 # define ROT				rotation_speed
 # define SHADOW_FPS			255 * e->shadows[(int)e->pos.x][(int)e->pos.y] / 3
+# define SHADOW_MINI		100 + (255 * e->shadows[x][y] / 6)
 # define TEX_HEIGHT			512
 # define TEX_WIDTH			512
 # define WIN_RAY_Y			(WIN_Y - 150)
@@ -35,6 +36,8 @@
 # define COLOR				create_color(color.b, color.g, color.r)
 # define DEFINE_ALAKON		sizeof(Uint32) * WIN_X * WIN_Y
 # define DEFINE_ALAKON2		WIN_X * sizeof(Uint32)
+# define MINIMAP_W			250
+# define MINIMAP_H			250
 
 typedef enum			e_texture_type
 {
@@ -221,6 +224,8 @@ typedef struct			s_env
 	SDL_Texture			*img;
 	SDL_Texture			*red_damage;
 	SDL_Texture			*weapon_all;
+	SDL_Surface			*minimap;
+	SDL_Texture			*hud_minimap;
 	SDL_Window			*window;
 	t_key				key;
 	t_player			player;
@@ -260,5 +265,8 @@ void					update_all_shadows(t_env *e);
 void					update_bullet_shadow_buffer(t_env *e);
 void					update_sprite(t_sprite *tmp, t_env *e);
 void					update_sprite_pos(t_env *e);
+void					init_minimap(t_env *e);
+void					display_minimap(t_env *e);
+SDL_Surface				*select_wall_type(int wall_type, t_env *e);
 
 #endif

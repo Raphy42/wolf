@@ -6,7 +6,7 @@
 #    By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2015/04/21 19:14:13 by mrbanane          #+#    #+#              #
-#    Updated: 2015/06/01 18:05:48 by rdantzer         ###   ########.fr        #
+#    Updated: 2015/06/03 17:10:42 by rdantzer         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,8 @@
 NAME= wolf3d
 
 SRC= main.c events.c parse.c draw.c tools.c sprite.c hud.c sprite_render.c\
-	sprite_sort.c color.c floor_cast.c shadows.c keys.c ray_cast.c
+	sprite_sort.c color.c floor_cast.c shadows.c keys.c ray_cast.c\
+	minimap.c
 
 OBJ= $(SRC:.c=.o)
 

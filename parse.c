@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/08 03:25:07 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/06/01 16:53:40 by rdantzer         ###   ########.fr       */
+/*   Updated: 2015/06/03 16:49:29 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,11 +84,12 @@ static void			create_img_buffer(t_env *e)
 	Uint32			*p;
 	SDL_Texture		*tex;
 
-	p = (Uint32 *)malloc(WIN_X * WIN_Y * sizeof(Uint32));
+	p = (Uint32 *)ft_memalloc(WIN_X * WIN_Y * sizeof(Uint32));
 	tex = SDL_CreateTexture(e->render, SDL_PIXELFORMAT_ARGB8888,
 		SDL_TEXTUREACCESS_STREAMING, WIN_X, WIN_Y);
 	e->img = tex;
 	e->img_buffer = p;
+	e->minimap = SDL_CreateRGBSurface(0, MINIMAP_W, MINIMAP_H, 32, 0, 0, 0, 0);
 }
 
 void				init(t_env *e)
@@ -114,4 +115,7 @@ void				init(t_env *e)
 	create_img_buffer(e);
 	convert_map(e);
 	e->pos = e->default_pos;
+	create_texture_array(e);
+	create_shadow_buffer(e);
+	init_minimap(e);
 }
