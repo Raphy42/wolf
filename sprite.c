@@ -6,7 +6,7 @@
 /*   By: rdantzer <rdantzer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/18 05:31:44 by rdantzer          #+#    #+#             */
-/*   Updated: 2015/06/01 17:33:59 by rdantzer         ###   ########.fr       */
+/*   Updated: 2016/09/13 03:16:45 by rdantzer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ void			update_sprite(t_sprite *tmp, t_env *e)
 			[(int)(tmp->pos.y + tmp->dir.y)])
 		{
 			tmp->light_source = 7;
+			e->level[(int)(tmp->pos.x + tmp->dir.x)][(int)(tmp->pos.y + tmp->dir.y)] = 0;
 			tmp->dir.x = 0;
 			tmp->dir.y = 0;
 			tmp->sprite = PARTICULE_EXPLOSION;
